@@ -88,6 +88,15 @@ workflows:
             - build
             - build-php
 
+      - aws-ecs/update-task-definition:
+          aws-region: ${AWS_DEFAULT_REGION}
+          context: org-global
+          family: '${CIRCLE_PROJECT_REPONAME}-task-definition'
+          requires:
+            - build
+            - build-php
+            - aws-ecr/build-and-push-image
+
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
@@ -98,3 +107,4 @@ workflows:
             - build
             - build-php
             - aws-ecr/build-and-push-image
+            - aws-ecs/update-task-definition
