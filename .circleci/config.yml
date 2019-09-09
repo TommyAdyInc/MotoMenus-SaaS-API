@@ -89,11 +89,11 @@ workflows:
             - build-php
 
       - aws-ecs/deploy-service-update:
+          aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
           container-image-name-updates: 'container=${CIRCLE_PROJECT_REPONAME}-service,tag=${CIRCLE_SHA1}'
           context: org-global
           family: '${CIRCLE_PROJECT_REPONAME}-service'
-          region: AWS_DEFAULT_REGION
           requires:
             - build
             - build-php
