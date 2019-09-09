@@ -90,6 +90,7 @@ workflows:
 
       - aws-ecs/update-task-definition:
           aws-region: ${AWS_DEFAULT_REGION}
+          container-image-name-updates: 'container=${CIRCLE_PROJECT_REPONAME}-service,tag=${CIRCLE_SHA1}'
           context: org-global
           family: '${CIRCLE_PROJECT_REPONAME}-task-definition'
           requires:
