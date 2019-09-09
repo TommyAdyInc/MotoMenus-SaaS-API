@@ -1,7 +1,9 @@
 global-working-directory: &working-directory "/home/circleci"
 
 version: 2.1
-
+orbs:
+  aws-ecr: circleci/aws-ecr@6.2.0
+  aws-ecs: circleci/aws-ecs@0.0.11
 jobs:
   build:
     docker:
@@ -71,3 +73,27 @@ workflows:
       - build-php:
           requires:
             - build
+
+      - aws-ecr/build-and-push-image:
+          context: org-global
+          create-repo: true
+          filters:
+            branches:
+              only:
+                - dev
+                - prod
+          region: AWS_DEFAULT_REGION
+          repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
+          requires:
+            - build
+            - build-php
+
+      - aws-ecs/deploy-service-update:
+          cluster-name: 'ecs-cluster'
+          container-image-name-updates: 'container=${CIRCLE_PROJECT_REPONAME}-service,tag=${CIRCLE_SHA1}'
+          context: org-global
+          family: '${CIRCLE_PROJECT_REPONAME}-service'
+          requires:
+            - build
+            - build-php
+            - aws-ecr/build_and_push_image
