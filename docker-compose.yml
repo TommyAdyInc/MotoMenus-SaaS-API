@@ -1,0 +1,28 @@
+version: '3.2'
+
+services:
+  nginx:
+    image: ${AWS_ECR_URI}/motomenus-saas-api-nginx:latest
+    ports:
+      - "40010:80"
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+
+  php-fpm:
+    image: ${AWS_ECR_URI}/motomenus-saas-api-php:latest
+    networks:
+      - default
+      - local-network
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+      - type: bind
+        source: ./local.ini
+        target: /usr/local/etc/php/conf.d/local.ini
+
+networks:
+  local-network:
+    external: true
