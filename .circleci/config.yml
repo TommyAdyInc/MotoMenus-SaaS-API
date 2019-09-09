@@ -1,0 +1,73 @@
+global-working-directory: &working-directory "/home/circleci"
+
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      # The primary container is an instance of the first image listed. The job's commands run in this container.
+      - image: circleci/buildpack-deps:stretch
+
+      # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
+      # - image: mysql:5.7.16
+
+    working_directory: *working-directory
+
+    steps:
+      - run: echo "Fanning out build steps."
+
+  build-php:
+    docker:
+      - image: composer:1.8.5
+
+    working_directory: *working-directory
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+
+      - run:
+          name: Install Composer dependencies.
+          environment:
+            COMPOSER_ALLOW_SUPERUSER: 1
+          command: composer install --no-interaction --no-progress --prefer-source --verbose
+
+      - save_cache:
+          key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          paths:
+            - "vendor"
+
+      - restore_cache:
+          keys:
+            - env-file-v1-{{ .Branch }}-{{ .Revision }}
+
+      - run:
+          name: Create .env file and set values.
+          command: |
+            cat > .env \<< EOL
+            APP_KEY=""
+            EOL
+
+      - run:
+          name: Generate an APP_KEY for the .env file.
+          command: |
+            php artisan key:generate
+            cat .env
+
+      - save_cache:
+          key: env-file-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".env"
+
+workflows:
+  version: 2
+  main-workflow:
+    jobs:
+      - build
+
+      - build-php:
+          requires:
+            - build
