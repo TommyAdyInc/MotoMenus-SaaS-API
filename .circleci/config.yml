@@ -91,7 +91,7 @@ workflows:
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
-          container-image-name-updates: 'container=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')-service,tag=${CIRCLE_SHA1}'
+          container-image-name-updates: 'container=$(echo "$CIRCLE_PROJECT_REPONAME" | tr [:upper:] [:lower:])-service,tag=${CIRCLE_SHA1}'
           context: org-global
           family: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')-service
           requires:
