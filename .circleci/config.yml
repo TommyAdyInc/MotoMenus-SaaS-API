@@ -88,24 +88,13 @@ workflows:
             - build
             - build-php
 
-      - aws-ecs/update-task-definition:
-          aws-region: ${AWS_DEFAULT_REGION}
-          container-image-name-updates: 'container=${CIRCLE_PROJECT_REPONAME}-service,tag=${CIRCLE_SHA1}'
-          context: org-global
-          family: '${CIRCLE_PROJECT_REPONAME}-task-definition'
-          requires:
-            - build
-            - build-php
-            - aws-ecr/build-and-push-image
-
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
-          container-image-name-updates: 'container=${CIRCLE_PROJECT_REPONAME}-service,tag=${CIRCLE_SHA1}'
+          container-image-name-updates: 'container=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')-service,tag=${CIRCLE_SHA1}'
           context: org-global
-          family: '${CIRCLE_PROJECT_REPONAME}-service'
+          family: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')-service
           requires:
             - build
             - build-php
             - aws-ecr/build-and-push-image
-            - aws-ecs/update-task-definition
