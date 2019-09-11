@@ -75,7 +75,7 @@ workflows:
             - build
 
       - aws-ecr/build-and-push-image:
-          context: org-global
+          context: 'org-global'
           create-repo: true
           filters:
             branches:
@@ -87,14 +87,16 @@ workflows:
           requires:
             - build
             - build-php
+          tag: '${CIRCLE_SHA1}'
 
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
           # container-image-name-updates: 'container=$(echo "$CIRCLE_PROJECT_REPONAME" | tr [:upper:] [:lower:])-service,tag=${CIRCLE_SHA1}'
-          context: org-global
-          family: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')-service
+          context: 'org-global'
+          family: 'test'
           requires:
             - build
             - build-php
             - aws-ecr/build-and-push-image
+          service-name: test-service
