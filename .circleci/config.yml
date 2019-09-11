@@ -20,6 +20,7 @@ jobs:
           name: "Make necessary replacements in task definition file"
           command: |
             set -x
+            cat task-definition.json
             sed -i -e "s;%AWS_ACCOUNT_ID%;${AWS_ACCOUNT_ID};g" task-definition.json
             sed -i -e "s;%AWS_DEFAULT_REGION%;${AWS_DEFAULT_REGION};g" task-definition.json
             sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
@@ -28,12 +29,19 @@ jobs:
             sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
             sed -i -e "s;%REPONAME_LOWERCASE%;${CIRCLE_PROJECT_REPONAME_LOWERCASE};g" task-definition.json
+            cat task-definition.json
+      - save_cache:
+          key: task-definition-v1-{{ .Branch }}-{{ checksum "task-definition.json" }}
+          paths:
+            - task-definition.json
 
   register-ecs-task-definition:
     executor: aws-cli/default
     steps:
-      - checkout
       - aws-cli/setup
+      - restore_cache:
+          keys:
+            - task-definition-v1-{{ .Branch }}-{{ checksum "task-definition.json" }}
       - run:
           name: "Register ECS task definition"
           command: |
