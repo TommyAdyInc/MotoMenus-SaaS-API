@@ -6,6 +6,17 @@ orbs:
   aws-ecs: circleci/aws-ecs@0.0.11
 
 jobs:
+  build-and-push-image:
+    steps:
+      - aws-ecr/build-and-push-image:
+          create-repo: true
+          region: AWS_DEFAULT_REGION
+          repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
+          tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
+      - run:
+          name: "Test"
+          command: echo "testing"
+
   register-ecs-task-definition:
     executor: aws-cli/default
     steps:
@@ -31,17 +42,13 @@ workflows:
   version: 2
   main-workflow:
     jobs:
-      - aws-ecr/build-and-push-image:
+      - build-and-push-image:
           context: 'org-global'
-          create-repo: true
           filters:
             branches:
               only:
                 - dev
                 - prod
-          region: AWS_DEFAULT_REGION
-          repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
-          tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
 
       - register-ecs-task-definition:
             context: 'org-global'
@@ -51,7 +58,7 @@ workflows:
                   - dev
                   - prod
             requires:
-              - aws-ecr/build-and-push-image
+              - build-and-push-image
 
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
