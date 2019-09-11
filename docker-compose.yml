@@ -2,16 +2,16 @@ version: '3.2'
 
 services:
   nginx:
-    image: ${AWS_ECR_URI}/motomenus-saas-api-nginx:latest
+    image: ${AWS_ECR_ACCOUNT_URL}/${DOCKER_IMAGE_NAME_NGINX}:latest
     ports:
-      - "40010:80"
+      - "${DOCKER_HOST_PORT}:80"
     volumes:
       - type: bind
         source: .
         target: /var/www/html
 
   php-fpm:
-    image: ${AWS_ECR_URI}/motomenus-saas-api-php:latest
+    image: ${AWS_ECR_ACCOUNT_URL}/${DOCKER_IMAGE_NAME_PHP}:latest
     networks:
       - default
       - local-network
