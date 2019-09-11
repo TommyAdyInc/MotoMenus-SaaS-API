@@ -38,6 +38,7 @@ jobs:
   register-ecs-task-definition:
     executor: aws-cli/default
     steps:
+      - checkout
       - aws-cli/setup
       - restore_cache:
           keys:
