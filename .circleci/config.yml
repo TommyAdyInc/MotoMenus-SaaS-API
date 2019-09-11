@@ -6,16 +6,18 @@ orbs:
   aws-ecs: circleci/aws-ecs@0.0.11
 
 jobs:
-  build-and-push-image:
+  generate-env-then-build-then-push-image:
+    executor: aws-ecr/default
     steps:
+      - checkout
+      - run:
+          name: "Generate the .env file"
+          command: echo "Testing 1 2 3"
       - aws-ecr/build-and-push-image:
           create-repo: true
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
           tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
-      - run:
-          name: "Test"
-          command: echo "testing"
 
   register-ecs-task-definition:
     executor: aws-cli/default
@@ -42,7 +44,7 @@ workflows:
   version: 2
   main-workflow:
     jobs:
-      - build-and-push-image:
+      - generate-env-then-build-then-push-image:
           context: 'org-global'
           filters:
             branches:
