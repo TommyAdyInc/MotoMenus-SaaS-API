@@ -12,24 +12,21 @@ jobs:
       - checkout
       - aws-cli/setup
       - run:
-          name: "BEFORE:"
-          command: echo ${CIRCLE_PROJECT_REPONAME}
-      - run:
-          name: "Setup custom environment variables"
+          name: "Lowercase the $CIRCLE_PROJECT_REPONAME environment variable"
           command: |
+            set -x
             echo 'export CIRCLE_PROJECT_REPONAME=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')' >> $BASH_ENV
       - run:
-          name: "AFTER:"
-          command: echo ${CIRCLE_PROJECT_REPONAME}
-      # - run:
-      #     name: Register ECS task definition.
-      #     command: |
-      #       set -x
-      #       sed -e "s;%REPO%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json > task-definition-${CIRCLE_PROJECT_REPONAME}.json
-      #       sed -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition-${CIRCLE_PROJECT_REPONAME}.json > task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}.json
-      #       sed -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}.json > task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}.json
-
-      #       aws ecs register-task-definition --region="${AWS_DEFAULT_REGION}" --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}.json
+          name: "Make necessary replacements in task definition file"
+          command: |
+            set -x
+            sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
+            sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
+            sed -i -e "s;%AWS_ECR_URI%;${AWS_ECR_URI};g" task-definition.json
+            sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
+      - run:
+          name: "Register ECS task definition"
+          command: aws ecs register-task-definition --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition.json
 
 workflows:
   version: 2
@@ -61,7 +58,7 @@ workflows:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
           context: 'org-global'
-          family: 'test'
+          family: '${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition'
           filters:
             branches:
               only:
@@ -70,4 +67,4 @@ workflows:
           requires:
             - aws-ecr/build-and-push-image
             - register-ecs-task-definition
-          service-name: test-service
+          service-name: '${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-service'

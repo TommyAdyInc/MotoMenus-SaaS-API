@@ -1,0 +1,60 @@
+{
+  "family": "%REPONAME%-%BRANCH%-task-definition",
+  "containerDefinitions": [
+    {
+      "essential": true,
+      "image": "%AWS_ECR_URI%/%REPONAME%:%IMAGE_TAG%",
+      "logConfiguration": {
+        "logDriver": "json-file",
+        "options": {
+          "max-size": "50m"
+        }
+      },
+      "memoryReservation": 50,
+      "name": "laravel"
+    },
+    {
+      "essential": true,
+      "image": "%AWS_ECR_URI%/%REPONAME%-nginx:latest",
+      "links": [
+        "php-fpm"
+      ],
+      "logConfiguration": {
+        "logDriver": "json-file",
+        "options": {
+          "max-size": "50m"
+        }
+      },
+      "memoryReservation": 100,
+      "name": "nginx",
+      "portMappings": [
+        {
+          "hostPort": 0,
+          "containerPort": 80
+        }
+      ],
+      "volumesFrom": [
+        {
+          "sourceContainer": "laravel"
+        }
+      ]
+    },
+    {
+      "essential": true,
+      "image": "%AWS_ECR_URI%/%REPONAME%-php:latest",
+      "logConfiguration": {
+        "logDriver": "json-file",
+        "options": {
+          "max-size": "50m"
+        }
+      },
+      "memoryReservation": 200,
+      "name": "php-fpm",
+      "volumesFrom": [
+        {
+          "sourceContainer": "laravel"
+        }
+      ]
+    }
+  ]
+}
