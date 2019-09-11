@@ -60,7 +60,7 @@ workflows:
                   - dev
                   - prod
             requires:
-              - build-and-push-image
+              - generate-env-then-build-then-push-image
 
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
@@ -73,6 +73,6 @@ workflows:
                 - dev
                 - prod
           requires:
-            - aws-ecr/build-and-push-image
+            - generate-env-then-build-then-push-image
             - register-ecs-task-definition
           service-name: '${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-service'
