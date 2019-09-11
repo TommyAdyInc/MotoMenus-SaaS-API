@@ -47,7 +47,7 @@ workflows:
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
           tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
 
-      - register-ecs-task-definition
+      - register-ecs-task-definition:
             context: 'aws'
             filters:
               branches:
