@@ -37,8 +37,8 @@ jobs:
       - run:
           name: "Register ECS task definition"
           command: |
-          set -x
-          aws ecs register-task-definition --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition.json
+            set -x
+            aws ecs register-task-definition --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition.json
 
 workflows:
   version: 2
