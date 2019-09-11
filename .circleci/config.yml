@@ -1,79 +1,40 @@
-global-working-directory: &working-directory "/home/circleci"
-
 version: 2.1
+
 orbs:
+  aws-cli: circleci/aws-cli@0.1.16
   aws-ecr: circleci/aws-ecr@6.2.0
   aws-ecs: circleci/aws-ecs@0.0.11
+
 jobs:
-  build:
-    docker:
-      # The primary container is an instance of the first image listed. The job's commands run in this container.
-      - image: circleci/buildpack-deps:stretch
-
-      # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
-      # - image: mysql:5.7.16
-
-    working_directory: *working-directory
-
-    steps:
-      - run: echo "Fanning out build steps."
-
-  build-php:
-    docker:
-      - image: composer:1.8.5
-
-    working_directory: *working-directory
-
+  register-ecs-task-definition:
+    executor: aws-cli/default
     steps:
       - checkout
-
-      - restore_cache:
-          keys:
-            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
-
+      - aws-cli/setup
       - run:
-          name: Install Composer dependencies.
-          environment:
-            COMPOSER_ALLOW_SUPERUSER: 1
-          command: composer install --no-interaction --no-progress --prefer-source --verbose
-
-      - save_cache:
-          key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
-          paths:
-            - "vendor"
-
-      - restore_cache:
-          keys:
-            - env-file-v1-{{ .Branch }}-{{ .Revision }}
-
+          name: "BEFORE:"
+          command: echo ${CIRCLE_PROJECT_REPONAME}
       - run:
-          name: Create .env file and set values.
+          name: "Setup custom environment variables"
           command: |
-            cat > .env \<< EOL
-            APP_KEY=""
-            EOL
-
+            echo 'export CIRCLE_PROJECT_REPONAME=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')' >> $BASH_ENV
       - run:
-          name: Generate an APP_KEY for the .env file.
-          command: |
-            php artisan key:generate
-            cat .env
+          name: "AFTER:"
+          command: echo ${CIRCLE_PROJECT_REPONAME}
+      # - run:
+      #     name: Register ECS task definition.
+      #     command: |
+      #       set -x
+      #       sed -e "s;%REPO%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json > task-definition-${CIRCLE_PROJECT_REPONAME}.json
+      #       sed -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition-${CIRCLE_PROJECT_REPONAME}.json > task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}.json
+      #       sed -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}.json > task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}.json
 
-      - save_cache:
-          key: env-file-v1-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ".env"
+      #       aws ecs register-task-definition --region="${AWS_DEFAULT_REGION}" --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}.json
 
 workflows:
   version: 2
   main-workflow:
     jobs:
-      - build
-
-      - build-php:
-          requires:
-            - build
-
       - aws-ecr/build-and-push-image:
           context: 'org-global'
           create-repo: true
@@ -84,19 +45,29 @@ workflows:
                 - prod
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
-          requires:
-            - build
-            - build-php
-          tag: '${CIRCLE_SHA1}'
+          tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
+
+      - register-ecs-task-definition
+            context: 'aws'
+            filters:
+              branches:
+                only:
+                  - dev
+                  - prod
+            requires:
+              - aws-ecr/build-and-push-image
 
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
           cluster-name: 'ecs-cluster'
-          # container-image-name-updates: 'container=$(echo "$CIRCLE_PROJECT_REPONAME" | tr [:upper:] [:lower:])-service,tag=${CIRCLE_SHA1}'
           context: 'org-global'
           family: 'test'
+          filters:
+            branches:
+              only:
+                - dev
+                - prod
           requires:
-            - build
-            - build-php
             - aws-ecr/build-and-push-image
+            - register-ecs-task-definition
           service-name: test-service
