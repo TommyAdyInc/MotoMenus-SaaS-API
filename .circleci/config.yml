@@ -12,17 +12,16 @@ jobs:
       - checkout
       - aws-cli/setup
       - run:
-          name: "Lowercase the $CIRCLE_PROJECT_REPONAME environment variable"
-          command: |
-            set -x
-            echo 'export CIRCLE_PROJECT_REPONAME=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')' >> $BASH_ENV
+          name: "Set an environment variable ($CIRCLE_PROJECT_REPONAME_LOWERCASE)"
+          command: echo 'export CIRCLE_PROJECT_REPONAME_LOWERCASE=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')' >> $BASH_ENV
       - run:
           name: "Make necessary replacements in task definition file"
           command: |
             set -x
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
+            sed -i -e "s;%REPONAME_LOWERCASE%;${CIRCLE_PROJECT_REPONAME_LOWERCASE};g" task-definition.json
             sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
-            sed -i -e "s;%AWS_ECR_URI%;${AWS_ECR_URI};g" task-definition.json
+            sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
             sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
       - run:
           name: "Register ECS task definition"

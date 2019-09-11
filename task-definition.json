@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "essential": true,
-      "image": "%AWS_ECR_URI%/%REPONAME%:%IMAGE_TAG%",
+      "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%:%IMAGE_TAG%",
       "logConfiguration": {
         "logDriver": "json-file",
         "options": {
@@ -15,7 +15,7 @@
     },
     {
       "essential": true,
-      "image": "%AWS_ECR_URI%/%REPONAME%-nginx:latest",
+      "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-nginx:latest",
       "links": [
         "php-fpm"
       ],
@@ -41,7 +41,7 @@
     },
     {
       "essential": true,
-      "image": "%AWS_ECR_URI%/%REPONAME%-php:latest",
+      "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-php:latest",
       "logConfiguration": {
         "logDriver": "json-file",
         "options": {
