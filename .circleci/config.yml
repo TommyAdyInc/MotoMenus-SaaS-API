@@ -48,7 +48,7 @@ workflows:
           tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
 
       - register-ecs-task-definition:
-            context: aws
+            context: 'org-global'
             filters:
               branches:
                 only:
