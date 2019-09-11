@@ -62,5 +62,6 @@
       ]
     }
   ],
+  "executionRoleArn": "arn:aws:iam::%AWS_ACCOUNT_ID%:role/ecsTaskExecutionRole",
   "family": "%REPONAME%-%BRANCH%-task-definition"
 }
