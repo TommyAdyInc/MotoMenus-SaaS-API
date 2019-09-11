@@ -9,7 +9,6 @@ jobs:
   generate-env-then-build-then-push-image:
     executor: aws-ecr/default
     steps:
-      - checkout
       - run:
           name: "Generate the .env file"
           command: echo "Testing 1 2 3"
@@ -31,11 +30,14 @@ jobs:
           name: "Make necessary replacements in task definition file"
           command: |
             set -x
+            sed -i -e "s;%AWS_ACCOUNT_ID%;${AWS_ACCOUNT_ID};g" task-definition.json
+            sed -i -e "s;%AWS_DEFAULT_REGION%;${AWS_DEFAULT_REGION};g" task-definition.json
+            sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
+            sed -i -e "s;%AWS_SECRET_NAME_APP_KEY%;${AWS_SECRET_NAME_APP_KEY};g" task-definition.json
+            sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
+            sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
             sed -i -e "s;%REPONAME_LOWERCASE%;${CIRCLE_PROJECT_REPONAME_LOWERCASE};g" task-definition.json
-            sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
-            sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
-            sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
       - run:
           name: "Register ECS task definition"
           command: aws ecs register-task-definition --family="${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition" --cli-input-json file://task-definition.json

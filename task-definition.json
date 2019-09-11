@@ -1,5 +1,4 @@
 {
-  "family": "%REPONAME%-%BRANCH%-task-definition",
   "containerDefinitions": [
     {
       "essential": true,
@@ -11,7 +10,13 @@
         }
       },
       "memoryReservation": 50,
-      "name": "laravel"
+      "name": "laravel",
+      "secrets": [
+        {
+          "name": "APP_KEY",
+          "valueFrom": "arn:aws:secretsmanager:%AWS_DEFAULT_REGION%:%AWS_ACCOUNT_ID%:secret:Laravel-APP_KEY-for-%REPONAME%-%AWS_SECRET_NAME_APP_KEY%"
+        }
+      ]
     },
     {
       "essential": true,
@@ -56,5 +61,6 @@
         }
       ]
     }
-  ]
+  ],
+  "family": "%REPONAME%-%BRANCH%-task-definition"
 }
