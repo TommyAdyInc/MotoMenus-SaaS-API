@@ -26,7 +26,7 @@ jobs:
             sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
             sed -i -e "s;%AWS_SECRET_NAME_APP_KEY%;${AWS_SECRET_NAME_APP_KEY};g" task-definition.json
             sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
-            sed -i -e "s;%IMAGE_TAG%;${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM};g" task-definition.json
+            sed -i -e "s;%IMAGE_TAG%;Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID};g" task-definition.json
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
             sed -i -e "s;%REPONAME_LOWERCASE%;${CIRCLE_PROJECT_REPONAME_LOWERCASE};g" task-definition.json
             cat task-definition.json
@@ -63,7 +63,7 @@ workflows:
                 - prod
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
-          tag: '${CIRCLE_BRANCH}-v${CIRCLE_BUILD_NUM}'
+          tag: 'Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID}'
 
       - make-replacements-in-task-definition:
           context: 'org-global'
