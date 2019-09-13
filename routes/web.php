@@ -15,4 +15,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('health-check', 'pages.health-check');
+Route::view('health-check', 'health-check');
