@@ -16,3 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('health-check', function () {
+    return response()->json([
+        'message' => 'The application is really, really healthy... like Chuck Norris healthy.',
+        'success' => true
+    ], 200, []);
+});

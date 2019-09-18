@@ -1,1 +1,0 @@
-The application is really, really healthy... like Chuck Norris healthy.
