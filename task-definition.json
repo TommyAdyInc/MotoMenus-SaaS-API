@@ -6,6 +6,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
+          "awslogs-create-group": true,
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
           "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
@@ -27,6 +28,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
+          "awslogs-create-group": true,
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
           "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
@@ -52,6 +54,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
+          "awslogs-create-group": true,
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
           "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
