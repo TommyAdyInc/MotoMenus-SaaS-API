@@ -115,7 +115,7 @@ workflows:
                 - dev
                 - prod
           requires:
-            - aws-ecr/build-and-push-image
+            - build-and-push-image
             - make-replacements-in-task-definition
 
       - aws-ecs/deploy-service-update:
