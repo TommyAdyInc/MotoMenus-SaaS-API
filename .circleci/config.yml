@@ -34,7 +34,7 @@ jobs:
       - restore_cache:
           keys:
             - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
-      - aws-ecr/build-and-push-image
+      - aws-ecr/build-and-push-image:
           create-repo: true
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
