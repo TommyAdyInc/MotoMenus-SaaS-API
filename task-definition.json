@@ -9,7 +9,7 @@
           "awslogs-create-group": "true",
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
-          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
+          "awslogs-stream-prefix": "Repo-%REPONAME%_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 50,
@@ -31,7 +31,7 @@
           "awslogs-create-group": "true",
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
-          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
+          "awslogs-stream-prefix": "Repo-%REPONAME%_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 100,
@@ -57,7 +57,7 @@
           "awslogs-create-group": "true",
           "awslogs-group": "ecs-awslogs-%BRANCH%",
           "awslogs-region": "%AWS_DEFAULT_REGION%",
-          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
+          "awslogs-stream-prefix": "Repo-%REPONAME%_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 200,
