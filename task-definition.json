@@ -21,9 +21,7 @@
     {
       "essential": true,
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-nginx:latest",
-      "links": [
-        "php-fpm"
-      ],
+      "links": ["php-fpm"],
       "logConfiguration": {
         "logDriver": "json-file",
         "options": {
@@ -46,7 +44,7 @@
     },
     {
       "essential": true,
-      "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-php:latest",
+      "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-php-fpm:latest",
       "logConfiguration": {
         "logDriver": "json-file",
         "options": {
