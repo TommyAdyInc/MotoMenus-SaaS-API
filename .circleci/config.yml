@@ -1,3 +1,5 @@
+global-working-directory: &working-directory "/home/circleci"
+
 version: 2.1
 
 orbs:
@@ -9,18 +11,17 @@ jobs:
   composer-install:
     docker:
       - image: composer:1.8.5
+    working_directory: *working-directory
     steps:
       - checkout
       - restore_cache:
           keys:
             - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
-
       - run:
           name: Install Composer dependencies
           environment:
             COMPOSER_ALLOW_SUPERUSER: 1
           command: composer install --no-interaction --no-progress --prefer-source --verbose
-
       - save_cache:
           key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
           paths:
@@ -28,6 +29,7 @@ jobs:
 
   build-and-push-image:
     executor: aws-cli/default
+    working_directory: *working-directory
     steps:
       - checkout
       - aws-cli/setup
