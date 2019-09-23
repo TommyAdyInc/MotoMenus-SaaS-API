@@ -16,14 +16,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - run:
           name: Install Composer dependencies
           environment:
             COMPOSER_ALLOW_SUPERUSER: 1
           command: composer install --no-interaction --no-progress --prefer-source --verbose
       - save_cache:
-          key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          key: composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
           paths:
             - "vendor"
 
@@ -35,7 +35,7 @@ jobs:
       - aws-cli/setup
       - restore_cache:
           keys:
-            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - aws-ecr/build-and-push-image:
           create-repo: true
           region: AWS_DEFAULT_REGION
