@@ -32,10 +32,10 @@ jobs:
     working_directory: *working-directory
     steps:
       - checkout
-      - aws-cli/setup
       - restore_cache:
           keys:
             - composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - aws-cli/setup
       - aws-ecr/build-and-push-image:
           create-repo: true
           region: AWS_DEFAULT_REGION
