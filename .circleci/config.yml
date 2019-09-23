@@ -6,6 +6,40 @@ orbs:
   aws-ecs: circleci/aws-ecs@0.0.11
 
 jobs:
+  composer-install:
+    docker:
+      - image: composer:1.8.5
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+
+      - run:
+          name: Install Composer dependencies
+          environment:
+            COMPOSER_ALLOW_SUPERUSER: 1
+          command: composer install --no-interaction --no-progress --prefer-source --verbose
+
+      - save_cache:
+          key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          paths:
+            - "vendor"
+
+  build-and-push-image:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup
+      - restore_cache:
+          keys:
+            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - aws-ecr/build-and-push-image
+          create-repo: true
+          region: AWS_DEFAULT_REGION
+          repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
+          tag: "Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID}"
+
   make-replacements-in-task-definition:
     docker:
       - image: circleci/buildpack-deps:stretch
@@ -53,20 +87,20 @@ workflows:
   version: 2
   main-workflow:
     jobs:
-      - aws-ecr/build-and-push-image:
-          context: 'org-global'
-          create-repo: true
+      - composer-install
+
+      - build-and-push-image:
+          context: "org-global"
           filters:
             branches:
               only:
                 - dev
                 - prod
-          region: AWS_DEFAULT_REGION
-          repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
-          tag: 'Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID}'
+          requires:
+            - composer-install
 
       - make-replacements-in-task-definition:
-          context: 'org-global'
+          context: "org-global"
           filters:
             branches:
               only:
@@ -74,7 +108,7 @@ workflows:
                 - prod
 
       - register-ecs-task-definition:
-          context: 'org-global'
+          context: "org-global"
           filters:
             branches:
               only:
@@ -86,17 +120,15 @@ workflows:
 
       - aws-ecs/deploy-service-update:
           aws-region: ${AWS_DEFAULT_REGION}
-          cluster-name: 'ecs-cluster'
-          context: 'org-global'
-          family: '${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition'
+          cluster-name: "ecs-cluster"
+          context: "org-global"
+          family: "${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-task-definition"
           filters:
             branches:
               only:
                 - dev
                 - prod
           requires:
-            - aws-ecr/build-and-push-image
-            - make-replacements-in-task-definition
             - register-ecs-task-definition
-          service-name: '${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-service'
+          service-name: "${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}-service"
           verify-revision-is-deployed: true
