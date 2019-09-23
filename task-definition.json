@@ -4,9 +4,11 @@
       "essential": true,
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%:%IMAGE_TAG%",
       "logConfiguration": {
-        "logDriver": "json-file",
+        "logDriver": "awslogs",
         "options": {
-          "max-size": "50m"
+          "awslogs-group": "ecs-awslogs-%BRANCH%",
+          "awslogs-region": "%AWS_DEFAULT_REGION%",
+          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 50,
@@ -23,9 +25,11 @@
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-nginx:latest",
       "links": ["php-fpm"],
       "logConfiguration": {
-        "logDriver": "json-file",
+        "logDriver": "awslogs",
         "options": {
-          "max-size": "50m"
+          "awslogs-group": "ecs-awslogs-%BRANCH%",
+          "awslogs-region": "%AWS_DEFAULT_REGION%",
+          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 100,
@@ -46,9 +50,11 @@
       "essential": true,
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-php-fpm:latest",
       "logConfiguration": {
-        "logDriver": "json-file",
+        "logDriver": "awslogs",
         "options": {
-          "max-size": "50m"
+          "awslogs-group": "ecs-awslogs-%BRANCH%",
+          "awslogs-region": "%AWS_DEFAULT_REGION%",
+          "awslogs-stream-prefix": "Repo-%REPONAME_Workflow-%WORKFLOW_ID%"
         }
       },
       "memoryReservation": 200,

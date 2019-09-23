@@ -28,6 +28,7 @@ jobs:
             sed -i -e "s;%IMAGE_TAG%;Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID};g" task-definition.json
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
             sed -i -e "s;%REPONAME_LOWERCASE%;${CIRCLE_PROJECT_REPONAME_LOWERCASE};g" task-definition.json
+            sed -i -e "s;%WORKFLOW_ID%;${CIRCLE_WORKFLOW_ID};g" task-definition.json
             cat task-definition.json
       - save_cache:
           key: task-definition-v1-{{ .Branch }}-{{ .Revision }}
