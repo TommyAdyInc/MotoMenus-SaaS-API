@@ -1,46 +1,52 @@
+global-working-directory: &working-directory "/tmp/working-directory"
+
 version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.16
-  aws-ecr: circleci/aws-ecr@6.2.0
+  aws-ecr: circleci/aws-ecr@6.3.0
   aws-ecs: circleci/aws-ecs@0.0.11
 
 jobs:
   composer-install:
     docker:
-      - image: composer:1.8.5
+      - image: composer:1.8.6
+    working_directory: *working-directory
     steps:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - run:
           name: Install Composer dependencies
           environment:
             COMPOSER_ALLOW_SUPERUSER: 1
           command: composer install --no-interaction --no-progress --prefer-source --verbose
       - save_cache:
-          key: composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          key: composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
           paths:
             - "vendor"
 
   build-and-push-image:
     executor: aws-cli/default
+    working_directory: *working-directory
     steps:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-v2-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - aws-cli/setup
       - aws-ecr/build-and-push-image:
           create-repo: true
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
+          setup-remote-docker: true
           tag: "Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID}"
 
   make-replacements-in-task-definition:
     docker:
       - image: circleci/buildpack-deps:stretch
+    working_directory: *working-directory
     steps:
       - checkout
       - run:
@@ -69,6 +75,7 @@ jobs:
 
   register-ecs-task-definition:
     executor: aws-cli/default
+    working_directory: *working-directory
     steps:
       - checkout
       - aws-cli/setup
