@@ -1,6 +1,20 @@
 version: "3.7"
 
 services:
+  cron:
+    command: crond -f -l 2
+    image: ${AWS_ECR_ACCOUNT_URL}/${DOCKER_IMAGE_NAME_PHP_FPM}:latest
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+      - type: bind
+        source: ./local.ini
+        target: /usr/local/etc/php/conf.d/local.ini
+      - type: bindx
+        source: ./crontab
+        target: /etc/crontabs/root
+
   nginx:
     image: ${AWS_ECR_ACCOUNT_URL}/${DOCKER_IMAGE_NAME_NGINX}:latest
     ports:
