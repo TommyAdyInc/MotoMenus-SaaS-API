@@ -1,6 +1,17 @@
 <?php
 
 /*
+* Retrieve secrets from AWS Secrets Manager and write to environment variables before Laravel boots.
+* See task-definition.json file for more information.
+*/
+$secrets = json_decode($_ENV['SECRETS']);
+if ($secrets) {
+	foreach($secrets as $key => $value) {
+		putenv("$key=$value");
+	}
+}
+
+/*
 |--------------------------------------------------------------------------
 | Create The Application
 |--------------------------------------------------------------------------
