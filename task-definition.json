@@ -3,23 +3,8 @@
     {
       "essential": true,
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%:%IMAGE_TAG%",
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-create-group": "true",
-          "awslogs-group": "ecs-awslogs-%BRANCH%",
-          "awslogs-region": "%AWS_DEFAULT_REGION%",
-          "awslogs-stream-prefix": "Repo-%REPONAME%_Workflow-%WORKFLOW_ID%"
-        }
-      },
       "memoryReservation": 50,
-      "name": "laravel",
-      "secrets": [
-        {
-          "name": "APP_KEY",
-          "valueFrom": "arn:aws:secretsmanager:%AWS_DEFAULT_REGION%:%AWS_ACCOUNT_ID%:secret:Laravel-APP_KEY-for-%REPONAME%-%AWS_SECRET_NAME_APP_KEY%"
-        }
-      ]
+      "name": "laravel"
     },
     {
       "essential": true,
@@ -49,6 +34,9 @@
       ]
     },
     {
+      "environment": [
+        { "name": "APP_ENV", "value": "%BRANCH%" }
+      ],
       "essential": true,
       "image": "%AWS_ECR_ACCOUNT_URL%/%REPONAME_LOWERCASE%-php-fpm:latest",
       "logConfiguration": {
@@ -62,6 +50,12 @@
       },
       "memoryReservation": 200,
       "name": "php-fpm",
+      "secrets": [
+        {
+          "name": "SECRETS",
+          "valueFrom": "arn:aws:secretsmanager:%AWS_DEFAULT_REGION%:%AWS_ACCOUNT_ID%:secret:%REPONAME%-env-vars-%BRANCH%"
+        }
+      ],
       "volumesFrom": [
         {
           "sourceContainer": "laravel"

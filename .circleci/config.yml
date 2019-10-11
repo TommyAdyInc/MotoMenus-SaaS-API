@@ -4,8 +4,8 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.16
-  aws-ecr: circleci/aws-ecr@6.3.0
-  aws-ecs: circleci/aws-ecs@0.0.11
+  aws-ecr: circleci/aws-ecr@6.5.0
+  aws-ecs: circleci/aws-ecs@0.0.18
 
 jobs:
   composer-install:
@@ -50,9 +50,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Set an environment variable ($CIRCLE_PROJECT_REPONAME_LOWERCASE)"
+          name: Set any environment variables needed in subsequent steps
           command: |
             set -x
+            # Lowercase the repo name.
             echo 'export CIRCLE_PROJECT_REPONAME_LOWERCASE=$(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')' >> $BASH_ENV
       - run:
           name: "Make necessary replacements in task definition file"
@@ -61,7 +62,6 @@ jobs:
             sed -i -e "s;%AWS_ACCOUNT_ID%;${AWS_ACCOUNT_ID};g" task-definition.json
             sed -i -e "s;%AWS_DEFAULT_REGION%;${AWS_DEFAULT_REGION};g" task-definition.json
             sed -i -e "s;%AWS_ECR_ACCOUNT_URL%;${AWS_ECR_ACCOUNT_URL};g" task-definition.json
-            sed -i -e "s;%AWS_SECRET_NAME_APP_KEY%;${AWS_SECRET_NAME_APP_KEY};g" task-definition.json
             sed -i -e "s;%BRANCH%;${CIRCLE_BRANCH};g" task-definition.json
             sed -i -e "s;%IMAGE_TAG%;Branch-${CIRCLE_BRANCH}_Workflow-${CIRCLE_WORKFLOW_ID};g" task-definition.json
             sed -i -e "s;%REPONAME%;${CIRCLE_PROJECT_REPONAME};g" task-definition.json
