@@ -11,7 +11,7 @@ services:
       - type: bind
         source: ./local.ini
         target: /usr/local/etc/php/conf.d/local.ini
-      - type: bindx
+      - type: bind
         source: ./crontab
         target: /etc/crontabs/root
 
