@@ -21,7 +21,7 @@ jobs:
           name: Install Composer dependencies
           environment:
             COMPOSER_ALLOW_SUPERUSER: 1
-          command: composer install --no-interaction --no-progress --prefer-source --verbose
+          command: composer install --no-dev --no-interaction --no-progress --no-scripts --prefer-source --verbose
       - save_cache:
           key: composer-install-v4-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
           paths:
