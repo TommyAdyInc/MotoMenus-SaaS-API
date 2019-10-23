@@ -1,9 +1,11 @@
-tests
+.circleci
 .git
 .idea
-.circleci
+.vscode
 
-.babelrc
+database
+tests
+
 .dockerignore
 .DS_Store
 .env
@@ -11,29 +13,15 @@ tests
 .gitattributes
 .gitignore
 
-circle.yml
+crontab
+composer.json
+composer.lock
 docker-compose.yml
 Dockerfile
 local.ini
-gulpfile.js
-package.json
-package-lock.json
-phpspec.yml
 phpunit.xml
 Thumbs.db
 task-definition.json
-webpack.mix.js
-
-node_modules
-*/node_modules
-*/*/node_modules
-*/*/*/node_modules
-*/*/*/*/node_modules
-*/*/*/*/*/node_modules
-*/*/*/*/*/*/node_modules
-*/*/*/*/*/*/*/node_modules
-*/*/*/*/*/*/*/*/node_modules
-*/*/*/*/*/*/*/*/*/node_modules
 
 *.log
 */*.log
@@ -56,3 +44,14 @@ node_modules
 */*/*/*/*/*/*/*.md
 */*/*/*/*/*/*/*/*.md
 */*/*/*/*/*/*/*/*/*.md
+
+*.txt
+*/*.txt
+*/*/*.txt
+*/*/*/*.txt
+*/*/*/*/*.txt
+*/*/*/*/*/*.txt
+*/*/*/*/*/*/*.txt
+*/*/*/*/*/*/*/*.txt
+*/*/*/*/*/*/*/*/*.txt
+*/*/*/*/*/*/*/*/*/*.txt
