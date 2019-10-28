@@ -6,6 +6,7 @@ use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
@@ -38,4 +39,26 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function user_role()
+    {
+        return $this->hasOne(UserRole::class);
+    }
+
+    public static function boot(): void
+    {
+        static::creating(function ($user) {
+            $user->password = !empty($user->password) ? Hash::make($user->password) : null;
+        });
+
+        static::updating(function ($user) {
+            $user->password = !empty(request()->get('password')) ? Hash::make(request()->get('password')) : $user->password;
+        });
+
+        static::deleting(function ($user) {
+            // $user->notes()->delete();
+        });
+
+        parent::boot();
+    }
 }

@@ -14,11 +14,13 @@ class UserSeeder extends Seeder
     public function run()
     {
         if (!User::where('email', 'flastname@motomenus.test')->first()) {
-            User::create([
+            $user = User::create([
                 'name'   => 'First LastName',
                 'email'        => 'flastname@motomenus.test',
-                'password'     => Hash::make('temp1212'),
+                'password'     => 'temp1212',
             ]);
+
+            $user->user_role()->create(['role' => 'admin']);
         }
     }
 }
