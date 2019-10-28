@@ -13,9 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => ['auth:api']], function() {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    })->name('get.authenticated.user');
+
+    Route::group(['prefix' => 'customers'], function() {
+        Route::get('', 'CustomerController@index')->name('get.customers');
+        Route::post('', 'CustomerController@store')->name('create.new.customer');
+        Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
+        Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
+    });
 });
+
 
 Route::get('health-check', function () {
     return response()->json([
