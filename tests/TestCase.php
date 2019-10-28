@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\TenantCustomer;
+use Hyn\Tenancy\Database\Connection;
 use Hyn\Tenancy\Environment;
 use Hyn\Tenancy\Models\Hostname;
 use Hyn\Tenancy\Models\Website;
@@ -24,7 +25,7 @@ abstract class TestCase extends BaseTestCase
     protected static $is_first_time_through = true;
 
     const WEBSITE_UUID = 'moto-v3-phpunit';
-    const HOSTNAME_FQDN = 'v3-local-phpunit.motomenus.com';
+    const HOSTNAME_FQDN = 'v3-local-phpunit.dev.motomenus.local';
     const TENANT_CUSTOMER_NAME = 'phpunit';
 
     protected function setUp() :void
@@ -49,6 +50,12 @@ abstract class TestCase extends BaseTestCase
         } catch(\Exception $e) {
             dump($e->getMessage());
         }
+    }
+
+    protected function tearDown() :void
+    {
+        // Skip parent tear down as it causes issues with running all tests at once
+        // parent::tearDown();
     }
 
     /**
@@ -92,7 +99,10 @@ abstract class TestCase extends BaseTestCase
     protected function switchActiveTenant()
     {
         dump('Switching active tenant...');
+        // ensure we have database tenant connection
+        config()->set('database.default', 'tenant');
 
+        $tenancy = app(Environment::class);
         $website_repository = app(WebsiteRepository::class);
         $website = $website_repository->findByUuid(self::WEBSITE_UUID);
 
@@ -101,8 +111,6 @@ abstract class TestCase extends BaseTestCase
         if(!$hostname) {
             throw new \Exception('Could not determine correct hostname.');
         }
-
-        $tenancy = app(Environment::class);
 
         $current_hostname = $tenancy->hostname($hostname);
         dump('Current Hostname FQDN = ' . $current_hostname->fqdn);
@@ -113,9 +121,6 @@ abstract class TestCase extends BaseTestCase
 
         $tenancy->tenant();
         $tenancy->identifyHostname();
-
-        // ensure we have database tenant connection
-        config()->set('database.default', 'tenant');
     }
 
     /**
