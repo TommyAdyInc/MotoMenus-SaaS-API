@@ -26,7 +26,10 @@ Route::group(['middleware' => ['auth:api']], function() {
         Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
     });
 
-    Route::get('user-roles', 'UserRolesController@index')->name('get.user.roles');
+    Route::group(['prefix' => 'users'], function() {
+        Route::put('/{user}', 'UserController@update')->name('update.user');
+        Route::get('/{user}', 'UserController@show')->name('retrieve.specific.user');
+    });
 });
 
 //Routes for Tenant Admin users
@@ -34,8 +37,6 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function() {
     Route::group(['prefix' => 'users'], function() {
         Route::get('', 'UserController@index')->name('get.users');
         Route::post('', 'UserController@store')->name('create.new.user');
-        Route::put('/{user}', 'UserController@update')->name('update.user');
-        Route::get('/{user}', 'UserController@show')->name('retrieve.specific.user');
     });
 });
 

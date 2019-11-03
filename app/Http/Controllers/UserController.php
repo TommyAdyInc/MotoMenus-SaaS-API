@@ -27,9 +27,8 @@ class UserController extends Controller
 
         try {
             $user = User::create(request()->all());
-            $user->user_role()->create(request()->all());
 
-            return response()->json($user->load('user_role'), 201);
+            return response()->json($user, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -45,10 +44,19 @@ class UserController extends Controller
         ]);
 
         try {
-            $user->update(request()->all());
-            $user->user_role()->update(['role' => request()->get('role')]);
+            if(!isAdmin()) {
+                if(auth()->id() !== $user->id) {
+                    throw new \Exception('Can only modify own user data.');
+                }
 
-            return response()->json($user->load('user_role'), 201);
+                if(request()->has('role') && request()->get('role') !== 'user') {
+                    throw new \Exception('Not allowed to modify user role.');
+                }
+            }
+
+            $user->update(request()->all());
+
+            return response()->json($user, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -57,7 +65,13 @@ class UserController extends Controller
     public function show(User $user)
     {
         try {
-            return response()->json($user->load('user_role'), 201);
+            if(!isAdmin()) {
+                if(auth()->id() !== $user->id) {
+                    throw new \Exception('Can only view own user data.');
+                }
+            }
+
+            return response()->json($user, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

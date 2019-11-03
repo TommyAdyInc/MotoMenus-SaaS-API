@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
-use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -26,7 +25,10 @@ class CustomerController extends Controller
         ]);
 
         try {
-            return response()->json(Customer::create(request()->all()), 201);
+            $customer = auth()->user()->customers()->create(request()->all());
+            $customer->note()->create(request()->only('note'));
+
+            return response()->json($customer->load('note', 'user'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -39,10 +41,21 @@ class CustomerController extends Controller
             'last_name'  => ['string', 'min:1'],
             'phone'      => ['string'],
             'email'      => ['email'],
+            'user_id'    => ['exists:tenant.users,id'],
+            'note'       => ['string'],
         ]);
 
         try {
-            return response()->json(tap($customer)->update(request()->all()), 201);
+            if(!isAdmin()) {
+                if(auth()->id() !== $customer->user_id) {
+                    throw new \Exception('Cannot update other user customer.');
+                }
+            }
+
+            $customer = tap($customer)->update(request()->all());
+            $customer->note()->update(request()->only('note'));
+
+            return response()->json($customer->load('note'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -51,6 +64,11 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         try {
+            if(!isAdmin()) {
+                if(auth()->id() !== $customer->user_id) {
+                    throw new \Exception('Cannot view other user customer.');
+                }
+            }
             return response()->json($customer, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
