@@ -46,6 +46,11 @@ class User extends Authenticatable
         return $this->hasMany(Customer::class);
     }
 
+    public function deals()
+    {
+        return $this->hasMany(Deal::class);
+    }
+
     public static function boot(): void
     {
         static::creating(function ($user) {

@@ -24,8 +24,14 @@ Route::group(['middleware' => ['auth:api']], function() {
         Route::post('', 'CustomerController@store')->name('create.new.customer');
         Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
         Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
+    });
 
-        Route::get('/export', 'ExportCustomerListController@index')->name('export.customer.list');
+    Route::group(['prefix' => 'deal'], function() {
+        Route::get('', 'DealController@index')->name('all.deals');
+        Route::post('', 'DealController@store')->name('store.deal');
+        Route::put('/{deal}', 'DealController@index')->name('update.deal');
+        Route::get('/{deal}', 'DealController@index')->name('show.deal');
+        Route::delete('/{deal}', 'DealController@index')->name('delete.deal');
     });
 
     Route::group(['prefix' => 'users'], function() {

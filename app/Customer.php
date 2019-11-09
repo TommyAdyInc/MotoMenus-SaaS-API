@@ -5,6 +5,7 @@ namespace App;
 use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Customer extends Model
@@ -26,6 +27,11 @@ class Customer extends Model
     ];
 
     protected $with = ['note', 'user'];
+
+    public function deals() :hasMany
+    {
+        return $this->hasMany(Deal::class);
+    }
 
     public function note(): MorphOne
     {
