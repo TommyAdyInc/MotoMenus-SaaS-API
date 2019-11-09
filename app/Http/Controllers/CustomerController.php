@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\User;
 
 class CustomerController extends Controller
 {
     public function index()
     {
         try {
-            return response()->json(Customer::orderBy('last_name')->paginate(20), 201);
+            return response()->json(Customer::filter()->canSeeAll()->orderBy('last_name')->paginate(20), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -25,7 +26,11 @@ class CustomerController extends Controller
         ]);
 
         try {
-            $customer = auth()->user()->customers()->create(request()->all());
+            $user = $this->canCreateForOtherUser()
+                ? User::find(request()->get('user_id'))
+                : auth()->user();
+
+            $customer = $user->customers()->create(request()->all());
             $customer->note()->create(request()->only('note'));
 
             return response()->json($customer->load('note', 'user'), 201);
@@ -73,5 +78,10 @@ class CustomerController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
+    }
+
+    protected function canCreateForOtherUser()
+    {
+        return isAdmin() && request()->has('user_id') && auth()->id() != request()->get('user_id');
     }
 }

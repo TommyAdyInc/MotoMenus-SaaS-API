@@ -32,8 +32,39 @@ class Customer extends Model
         return $this->morphOne(Note::class, 'notable');
     }
 
-    public function user() :BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeCanSeeAll($query)
+    {
+        if (!isAdmin()) {
+            $query->whereUserId(auth()->id());
+        }
+
+        return $query;
+    }
+
+    public function scopeFilter($query)
+    {
+        // loose filtering using request
+        collect($this->fillable)
+            ->each(function ($field) use (&$query) {
+                if ($this->requestHas($field)) {
+                    if($field == 'user_id') {
+                        $query->whereUserId($field);
+                    } else {
+                        $query->where($field, 'LIKE', '%' . request()->get($field) . '%');
+                    }
+                }
+            });
+
+        return $query;
+    }
+
+    private function requestHas($field)
+    {
+        return request()->has($field) && !empty(request()->get($field));
     }
 }

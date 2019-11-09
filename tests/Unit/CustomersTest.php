@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Customer;
 use App\User;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -136,5 +137,21 @@ class CustomersTest extends TestCase
         $response->assertStatus(422);
         $response = json_decode($response->getContent(), true);
         $this->assertEquals('Cannot update other user customer.', $response['error']);
+    }
+
+    /** @test * */
+    function filter_customers_returns_only_requested_based_on_filter()
+    {
+        Passport::actingAs($this->user);
+
+        $customers = factory(Customer::class, 5)->create();
+
+        $response = $this->json('GET','/api/customers', [
+            'email' => $customers->first()->email,
+        ]);
+
+        $response->assertStatus(201);
+        $response = json_decode($response->getContent(), true);
+        $this->assertEquals(1, collect($response['data'])->count());
     }
 }

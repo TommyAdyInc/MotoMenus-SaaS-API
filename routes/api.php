@@ -24,6 +24,8 @@ Route::group(['middleware' => ['auth:api']], function() {
         Route::post('', 'CustomerController@store')->name('create.new.customer');
         Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
         Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
+
+        Route::get('/export', 'ExportCustomerListController@index')->name('export.customer.list');
     });
 
     Route::group(['prefix' => 'users'], function() {
