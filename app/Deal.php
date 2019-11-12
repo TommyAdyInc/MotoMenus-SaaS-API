@@ -12,6 +12,8 @@ class Deal extends Model
     protected $fillable = [
         'customer_id',
         'user_id',
+        'customer_type',
+        'sale_status',
     ];
 
     protected $with = [
@@ -63,6 +65,44 @@ class Deal extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function addRelatedModules()
+    {
+        // add any Units to deal
+        if (request()->has('units')) {
+            collect(request()->get('units'))->each(function ($unit) {
+                $this->units()->create($unit);
+            });
+        }
+
+        // add any Trades to deal
+        if (request()->has('trades')) {
+            collect(request()->get('trades'))->each(function ($trade) {
+                $this->trades()->create($trade);
+            });
+        }
+
+        // Add any accessories to deal
+        if (request()->has('accessories')) {
+            collect(request()->get('accessories'))->each(function ($acc) {
+                $this->accessories()->create($acc);
+            });
+        }
+
+        // add Purchase information to deal
+        if (request()->has('purchase_information')) {
+            $this->purchase_information()->create(request()->get('purchase_information'));
+        }
+
+        // add payment schedule to deal
+        if (request()->has('payment_schedule')) {
+            $this->payment_schedule()->create(request()->get('payment_schedule'));
+        }
+
+        // add F&I to deal
+        if (request()->has('finance_insurance')) {
+            $this->finance_insurance()->create(request()->get('finance_insurance'));
+        }
+    }
 
     public function scopeCanGetAll($query)
     {
@@ -94,30 +134,36 @@ class Deal extends Model
             });
         }
 
-        if(request()->has('unit') && !empty(request()->get('unit'))) {
+        if (request()->has('unit') && !empty(request()->get('unit'))) {
             $query->whereHas('units', function ($q) {
-                collect(request()->get('unit'))->each(function($val, $key) use (&$q) {
+                collect(request()->get('unit'))->each(function ($val, $key) use (&$q) {
                     $q->where($key, 'LIKE', '%' . $val);
                 });
             });
         }
 
-        if(request()->has('trade') && !empty(request()->get('trade'))) {
+        if (request()->has('trade') && !empty(request()->get('trade'))) {
             $query->whereHas('trades', function ($q) {
-                collect(request()->get('trade'))->each(function($val, $key) use (&$q) {
+                collect(request()->get('trade'))->each(function ($val, $key) use (&$q) {
                     $q->where($key, 'LIKE', '%' . $val);
                 });
             });
         }
 
-        if(request()->has('customer') && !empty(request()->get('customer'))) {
+        if (request()->has('customer') && !empty(request()->get('customer'))) {
             $query->whereHas('customer', function ($q) {
-                collect(request()->get('customer'))->each(function($val, $key) use (&$q) {
+                collect(request()->get('customer'))->each(function ($val, $key) use (&$q) {
                     $q->where($key, 'LIKE', '%' . $val);
                 });
             });
         }
 
         return $query;
+    }
+
+
+    public function setCustomerTypeAttribute($value)
+    {
+        $this->attributes['customer_type'] = json_encode($value);
     }
 }

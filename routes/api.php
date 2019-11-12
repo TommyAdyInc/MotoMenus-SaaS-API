@@ -14,35 +14,37 @@ use Illuminate\Http\Request;
 */
 
 // Routes for all Tenant users
-Route::group(['middleware' => ['auth:api']], function() {
+Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     })->name('get.authenticated.user');
 
-    Route::group(['prefix' => 'customers'], function() {
+    Route::group(['prefix' => 'customers'], function () {
         Route::get('', 'CustomerController@index')->name('get.customers');
         Route::post('', 'CustomerController@store')->name('create.new.customer');
         Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
         Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
     });
 
-    Route::group(['prefix' => 'deal'], function() {
+    Route::group(['prefix' => 'deal'], function () {
         Route::get('', 'DealController@index')->name('all.deals');
         Route::post('', 'DealController@store')->name('store.deal');
         Route::put('/{deal}', 'DealController@index')->name('update.deal');
         Route::get('/{deal}', 'DealController@index')->name('show.deal');
         Route::delete('/{deal}', 'DealController@index')->name('delete.deal');
+
+        Route::get('options', 'DealOptionsController@index')->name('deal.options');
     });
 
-    Route::group(['prefix' => 'users'], function() {
+    Route::group(['prefix' => 'users'], function () {
         Route::put('/{user}', 'UserController@update')->name('update.user');
         Route::get('/{user}', 'UserController@show')->name('retrieve.specific.user');
     });
 });
 
 //Routes for Tenant Admin users
-Route::group(['middleware' => ['auth:api', 'auth.admin']], function() {
-    Route::group(['prefix' => 'users'], function() {
+Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
+    Route::group(['prefix' => 'users'], function () {
         Route::get('', 'UserController@index')->name('get.users');
         Route::post('', 'UserController@store')->name('create.new.user');
     });
