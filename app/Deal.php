@@ -70,37 +70,49 @@ class Deal extends Model
         // add any Units to deal
         if (request()->has('units')) {
             collect(request()->get('units'))->each(function ($unit) {
-                $this->units()->create($unit);
+                if ($this->hasFilledFields($unit)) {
+                    $this->units()->create($unit);
+                }
             });
         }
 
         // add any Trades to deal
         if (request()->has('trades')) {
             collect(request()->get('trades'))->each(function ($trade) {
-                $this->trades()->create($trade);
+                if ($this->hasFilledFields($trade)) {
+                    $this->trades()->create($trade);
+                }
             });
         }
 
         // Add any accessories to deal
         if (request()->has('accessories')) {
             collect(request()->get('accessories'))->each(function ($acc) {
-                $this->accessories()->create($acc);
+                if ($this->hasFilledFields($acc)) {
+                    $this->accessories()->create($acc);
+                }
             });
         }
 
         // add Purchase information to deal
         if (request()->has('purchase_information')) {
-            $this->purchase_information()->create(request()->get('purchase_information'));
+            if ($this->hasFilledFields(request()->get('purchase_information'))) {
+                $this->purchase_information()->create(request()->get('purchase_information'));
+            }
         }
 
         // add payment schedule to deal
         if (request()->has('payment_schedule')) {
-            $this->payment_schedule()->create(request()->get('payment_schedule'));
+            if ($this->hasFilledFields(request()->get('payment_schedule'))) {
+                $this->payment_schedule()->create(request()->get('payment_schedule'));
+            }
         }
 
         // add F&I to deal
         if (request()->has('finance_insurance')) {
-            $this->finance_insurance()->create(request()->get('finance_insurance'));
+            if ($this->hasFilledFields(request()->get('finance_insurance'))) {
+                $this->finance_insurance()->create(request()->get('finance_insurance'));
+            }
         }
     }
 
@@ -165,5 +177,14 @@ class Deal extends Model
     public function setCustomerTypeAttribute($value)
     {
         $this->attributes['customer_type'] = json_encode($value);
+    }
+
+    private function hasFilledFields($array)
+    {
+        return collect($array)->reduce(function ($carry, $a) {
+            $carry = $carry || !empty($a);
+
+            return $carry;
+        }, false);
     }
 }

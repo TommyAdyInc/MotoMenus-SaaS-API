@@ -39,7 +39,8 @@ class DealController extends Controller
     //            'email'      => 'first@last.com',
     // ]
 
-    // payment_options json field example
+    // payment_schedule is an array of rate, payment_options and show_accessories_payments_on_pdf
+    // payment_schedule.payment_options example
     // [
     //      'down_payment_options' => [1000, 2000, 3000],
     //      'months'               => [18, 24, 36],
@@ -50,6 +51,11 @@ class DealController extends Controller
 
     // customer_type json field example ['Be-back', 'Dead'] current options: Be-back  Internet Lead  Phone-up  Walk-in  Dead
     // (with json field leaves option to expand to any amount of types instead of having to create table field for each type)
+
+    // accessories is array of arrays with fillable fields as per Accessories::class
+    // units is array of arrays with fillable fields as per Unit::class
+    // trades is array of arrays with fillable fields as per Trade::class
+    // purchase_information and finance_insurance are arrays of fillable fields in PurchaseInformation::class and FinanceInsurance::class
 
     public function store()
     {
@@ -74,7 +80,8 @@ class DealController extends Controller
 
             $deal->addRelatedModules();
 
-            return response()->json(true, 201);
+            return response()->json($deal->load('customer', 'accessories', 'units', 'trades', 'payment_schedule',
+                'finance_insurance', 'purchase_information'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -86,7 +93,7 @@ class DealController extends Controller
         // and not having to rely on Request injection
 
         request()->validate([
-            'user_id'                                => [
+            'user_id'                                                 => [
                 'required',
                 'exists:tenant.users,id',
                 function ($attribute, $value, $fail) {
@@ -95,22 +102,37 @@ class DealController extends Controller
                     }
                 }
             ],
-            'customer'                               => ['required', 'array'],
-            'customer.id'                            => ['exists:tenant.customers,id'],
-            'customer.first_name'                    => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.last_name'                     => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.phone'                         => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.email'                         => [
+            'customer'                                                => ['required', 'array'],
+            'customer.id'                                             => ['exists:tenant.customers,id'],
+            'customer.first_name'                                     => [empty(request()->get('customer')['id']) ? 'required' : ''],
+            'customer.last_name'                                      => [empty(request()->get('customer')['id']) ? 'required' : ''],
+            'customer.phone'                                          => [empty(request()->get('customer')['id']) ? 'required' : ''],
+            'customer.email'                                          => [
                 empty(request()->get('customer')['id']) ? 'required' : '',
                 'email'
             ],
-            'sales_status'                           => [
+            'accessories'                                             => ['nullable', 'array'],
+            // Array of one or more accessories. May be submitted as empty value and will then be ignored
+            'accessories.*.item_name'                                 => ['required', 'string'],
+            'accessories.*.msrp'                                      => ['numeric', 'min:0'],
+            'accessories.*.labor'                                     => ['numeric', 'min:0'],
+            'accessories.*.unit_price'                                => ['numeric', 'min:0'],
+            'accessories.*.quantity'                                  => ['required', 'integer', 'min:1'],
+            'units'                                                   => ['nullable', 'array'],
+            // Array of one or more units. May be submitted as empty value and will then be ignored
+            'units.*.odometer'                                        => ['numeric', 'min:0'],
+            'units.*.year'                                            => ['integer'],
+            'trades'                                                  => ['nullable', 'array'],
+            // Array of one or more trades. May be submitted as empty value and will then be ignored
+            'trades.*.odometer'                                       => ['numeric', 'min:0'],
+            'trades.*.year'                                           => ['integer'],
+            'sales_status'                                            => [
                 'required',
                 Rule::in(
                     config('sale_status')
                 )
             ],
-            'customer_type'                          => [
+            'customer_type'                                           => [
                 'array',
                 function ($attribute, $value, $fail) {
                     if (count(array_diff($value, config('customer_types'))) > 0) {
@@ -118,11 +140,67 @@ class DealController extends Controller
                     }
                 }
             ],
-            'payment_options'                        => ['array'],
-            'payment_options.down_payment_options'   => ['array'],
-            'payment_options.down_payment_options.*' => ['numeric'],
-            'payment_options.months'                 => ['array'],
-            'payment_options.months.*'               => ['numeric', Rule::in(config('payment_months'))],
+            'payment_schedule'                                        => ['array'],
+            'payment_schedule.rate'                                   => ['required_with:payment_schedule', 'numeric'],
+            'payment_schedule.payment_options.down_payment_options'   => ['array'],
+            'payment_schedule.payment_options.down_payment_options.*' => ['numeric'],
+            'payment_schedule.payment_options.months'                 => ['array'],
+            'payment_schedule.payment_options.months.*'               => [
+                'numeric',
+                Rule::in(config('payment_months'))
+            ],
+            'finance_insurance'                                       => ['array'],
+            'finance_insurance.cash_down_payment'                     => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.preferred_standard_rate'               => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.preferred_standard_term'               => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.promotional_rate'                      => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.promotional_term'                      => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.full_protection'                       => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.limited_protection'                    => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.tire_wheel'                            => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.gap_coverage'                          => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.theft'                                 => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.priority_maintenance'                  => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.appearance_protection'                 => ['nullable', 'numeric', 'min:0'],
+            'purchase_information'                                    => ['array'],
+            'purchase_information.msrp'                               => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.price'                              => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.manufacturer_freight'               => ['nullable', 'numeric'],
+            'purchase_information.technician_setup'                   => ['nullable', 'numeric'],
+            'purchase_information.accessories'                        => ['nullable', 'numeric'],
+            'purchase_information.accessories_labor'                  => ['nullable', 'numeric'],
+            'purchase_information.labor'                              => ['nullable', 'numeric'],
+            'purchase_information.riders_edge_course'                 => ['nullable', 'numeric'],
+            'purchase_information.miscellaneous_costs'                => ['nullable', 'numeric'],
+            'purchase_information.document_fee'                       => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.trade_in_allowance'                 => ['nullable', 'numeric'],
+            'purchase_information.sales_tax_rate'                     => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.payoff_balance_owed'                => ['nullable', 'numeric'],
+            'purchase_information.title_trip_fee'                     => ['nullable', 'numeric'],
+            'purchase_information.deposit'                            => ['nullable', 'numeric'],
+            'purchase_information.taxable_show_msrp_on_pdf'           => ['nullable', 'boolean'],
+            'purchase_information.taxable_price'                      => ['nullable', 'boolean'],
+            'purchase_information.taxable_manufacturer_freight'       => ['nullable', 'boolean'],
+            'purchase_information.taxable_technician_setup'           => ['nullable', 'boolean'],
+            'purchase_information.taxable_accessories'                => ['nullable', 'boolean'],
+            'purchase_information.taxable_accessories_labor'          => ['nullable', 'boolean'],
+            'purchase_information.taxable_labor'                      => ['nullable', 'boolean'],
+            'purchase_information.taxable_riders_edge_course'         => ['nullable', 'boolean'],
+            'purchase_information.taxable_miscellaneous_costs'        => ['nullable', 'boolean'],
+            'purchase_information.taxable_document_fee'               => ['nullable', 'boolean'],
+            'purchase_information.tax_credit_on_trade'                => ['nullable', 'boolean'],
         ]);
     }
 }

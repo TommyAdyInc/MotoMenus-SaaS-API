@@ -23,8 +23,8 @@ class DealsTest extends TestCase
     private function validParams($overrides = [])
     {
         return array_merge([
-            'user_id'     => $this->user->id,
-            'customer'    => [
+            'user_id'      => $this->user->id,
+            'customer'     => [
                 'first_name' => 'some_name',
                 'last_name'  => 'some_name',
                 'email'      => 'some_name@test.com',
@@ -216,5 +216,129 @@ class DealsTest extends TestCase
             ->assertStatus(201);
     }
 
-    // TODO: add tests for Units, Trades, Accessories, Purchase Info, Payment Schedule and F&I
+    /** @test * */
+    function it_creates_and_attaches_units_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'units' => [
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+                ],
+                [
+                    'stock_number' => 'Y987654',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+                ]
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['Y123456'])
+            ->assertJsonFragment(['Y987654']);
+    }
+
+    /** @test * */
+    function it_creates_and_attaches_trades_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'trades' => [
+                [
+                    'vin'      => 'YT123456',
+                    'year'     => 2018,
+                    'make'     => 'yamaha',
+                    'odometer' => 1,
+                ],
+                [
+                    'vin'      => 'YT987654',
+                    'year'     => 2018,
+                    'make'     => 'yamaha',
+                    'odometer' => 1,
+                ]
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['YT123456'])
+            ->assertJsonFragment(['YT987654']);
+    }
+
+    /** @test * */
+    function it_creates_and_attaches_accessories_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'accessories' => [
+                [
+                    'part_number' => 'ACC12345',
+                    'item_name'   => 'Item',
+                    'quantity'    => 1,
+                ],
+                [
+                    'part_number' => 'ACC98765',
+                    'item_name'   => 'Item',
+                    'quantity'    => 1,
+                ]
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['ACC12345'])
+            ->assertJsonFragment(['ACC98765']);
+    }
+
+    /** @test * */
+    function it_creates_and_attaches_payment_schedule_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'payment_schedule' => [
+                'rate'            => 13.49,
+                'payment_options' => [
+                    'down_payment_options' => [1000, 2000, 3000],
+                    'months'               => [18, 24, 48],
+                ]
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment([2000])
+            ->assertJsonFragment(['13.49']);
+    }
+
+    /** @test * */
+    function it_creates_and_attaches_finance_and_insurance_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'finance_insurance' => [
+                'cash_down_payment' => 20000,
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['20000.00']);
+    }
+
+    /** @test * */
+    function it_creates_and_attaches_purchase_info_to_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'purchase_information' => [
+                'msrp'           => 12345,
+                'price'          => 23456,
+                'sales_tax_rate' => 6.225,
+                'document_fee'   => 259,
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['23456.00']);
+    }
 }

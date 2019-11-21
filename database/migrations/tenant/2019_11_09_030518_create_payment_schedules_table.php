@@ -18,6 +18,7 @@ class CreatePaymentSchedulesTable extends Migration
             $table->decimal('rate');
             $table->boolean('show_accessories_payments_on_pdf')->default(false);
             $table->json('payment_options');
+            $table->integer('deal_id');
             $table->timestamps();
         });
     }

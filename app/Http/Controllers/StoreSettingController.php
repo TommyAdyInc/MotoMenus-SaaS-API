@@ -18,7 +18,8 @@ class StoreSettingController extends Controller
     public function update(StoreSetting $store_setting)
     {
         request()->validate([
-            'default_interest_rate' => ['number', 'min:0.01']
+            'default_interest_rate' => ['number', 'min:0.01'],
+            'default_tax_rate'      => ['number', 'min:0.01'],
         ]);
 
         try {

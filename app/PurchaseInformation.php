@@ -23,11 +23,17 @@ class PurchaseInformation extends Model
         'payoff_balance_owed',
         'title_trip_fee',
         'deposit',
-        'taxables',
-    ];
-
-    protected $casts = [
-        'taxables' => 'array'
+        'taxable_show_msrp_on_pdf',
+        'taxable_price',
+        'taxable_manufacturer_freight',
+        'taxable_technician_setup',
+        'taxable_accessories',
+        'taxable_accessories_labor',
+        'taxable_labor',
+        'taxable_riders_edge_course',
+        'taxable_miscellaneous_costs',
+        'taxable_document_fee',
+        'tax_credit_on_trade'
     ];
 
     public function deal() :belongsTo

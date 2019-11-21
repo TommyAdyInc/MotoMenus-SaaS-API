@@ -40,6 +40,8 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::put('/{user}', 'UserController@update')->name('update.user');
         Route::get('/{user}', 'UserController@show')->name('retrieve.specific.user');
     });
+
+    Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');
 });
 
 //Routes for Tenant Admin users

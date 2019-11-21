@@ -15,7 +15,8 @@ class CreateStoreSettingsTable extends Migration
     {
         Schema::create('store_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->decimal('default_interest_rate', 4,2)->default(10);
+            $table->decimal('default_interest_rate', 4, 2)->default(13.49);
+            $table->decimal('default_tax_rate', 5, 3)->default(6.25);
             $table->timestamps();
         });
     }

@@ -27,7 +27,7 @@ class CreatePurchaseInformationTable extends Migration
             $table->decimal('miscellaneous_costs')->nullable();
             $table->decimal('document_fee');
             $table->decimal('trade_in_allowance')->nullable();
-            $table->decimal('sales_tax_rate');
+            $table->decimal('sales_tax_rate', 5, 3);
             $table->decimal('payoff_balance_owed')->nullable();
             $table->decimal('title_trip_fee')->nullable();
             $table->decimal('deposit')->nullable();
@@ -41,6 +41,7 @@ class CreatePurchaseInformationTable extends Migration
             $table->boolean('taxable_riders_edge_course')->default(true);
             $table->boolean('taxable_miscellaneous_costs')->default(false);
             $table->boolean('taxable_document_fee')->default(false);
+            $table->boolean('tax_credit_on_trade')->default(false);
             $table->timestamps();
         });
     }
