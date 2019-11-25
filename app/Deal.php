@@ -13,7 +13,7 @@ class Deal extends Model
         'customer_id',
         'user_id',
         'customer_type',
-        'sale_status',
+        'sales_status',
     ];
 
     protected $with = [
@@ -112,6 +112,72 @@ class Deal extends Model
         if (request()->has('finance_insurance')) {
             if ($this->hasFilledFields(request()->get('finance_insurance'))) {
                 $this->finance_insurance()->create(request()->get('finance_insurance'));
+            }
+        }
+    }
+
+    public function updateRelatedModules()
+    {
+        // add and update any Units to deal
+        if (request()->has('units')) {
+            collect(request()->get('units'))->each(function ($unit) {
+                if ($this->hasFilledFields($unit)) {
+                    if (isset($unit['id'])) {
+                        $this->units()->where('units.id', $unit['id'])->update($unit);
+                    } else {
+                        $this->units()->create($unit);
+                    }
+                }
+            });
+        }
+
+        // add and update any Trades to deal
+        if (request()->has('trades')) {
+            collect(request()->get('trades'))->each(function ($trade) {
+                if ($this->hasFilledFields($trade)) {
+                    if (isset($trade['id'])) {
+                        $this->trades()->where('trades.id', $trade['id'])->update($trade);
+                    } else {
+                        $this->trades()->create($trade);
+                    }
+                }
+            });
+        }
+
+        // Add any accessories to deal
+        if (request()->has('accessories')) {
+            collect(request()->get('accessories'))->each(function ($acc) {
+                if ($this->hasFilledFields($acc)) {
+                    if (isset($acc['id'])) {
+                        $this->accessories()->where('accessories.id', $acc['id'])->update($acc);
+                    } else {
+                        $this->accessories()->create($acc);
+                    }
+                }
+            });
+        }
+
+        // add/update Purchase information to deal
+        if (request()->has('purchase_information')) {
+            if ($this->hasFilledFields(request()->get('purchase_information'))) {
+                $this->purchase_information()->updateOrCreate(request()->get('purchase_information.id') ?? [],
+                    request()->get('purchase_information'));
+            }
+        }
+
+        // add/update payment schedule to deal
+        if (request()->has('payment_schedule')) {
+            if ($this->hasFilledFields(request()->get('payment_schedule'))) {
+                $this->payment_schedule()->updateOrCreate(request()->get('payment_schedule.id') ?? [],
+                    request()->get('payment_schedule'));
+            }
+        }
+
+        // add F&I to deal
+        if (request()->has('finance_insurance')) {
+            if ($this->hasFilledFields(request()->get('finance_insurance'))) {
+                $this->finance_insurance()->updateOrCreate(request()->get('finance_insurance.id') ?? [],
+                    request()->get('finance_insurance'));
             }
         }
     }

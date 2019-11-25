@@ -341,4 +341,113 @@ class DealsTest extends TestCase
             ->assertStatus(201)
             ->assertJsonFragment(['23456.00']);
     }
+
+    /** @test * */
+    function updating_requires_an_existing_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('PUT', '/api/deal/10', [])
+            ->assertStatus(404);
+
+        $this->json('POST', '/api/deal', $this->validParams())
+            ->assertStatus(201);
+
+        $this->json('PUT', '/api/deal/1', $this->validParams(['customer' => ['id' => 1]]))
+            ->assertStatus(201);
+    }
+
+    /** @test * */
+    function it_creates_purchase_info_when_updating_deal_if_non_present_else_updates_existing_purchase_info()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams())
+            ->assertStatus(201);
+
+        $this->json('PUT', '/api/deal/1', $this->validParams([
+            'customer'             => ['id' => 1],
+            'purchase_information' => [
+                'msrp'           => 12345,
+                'price'          => 23456,
+                'sales_tax_rate' => 6.225,
+                'document_fee'   => 259,
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['23456.00']);
+
+        $this->json('PUT', '/api/deal/1', $this->validParams([
+            'customer'             => ['id' => 1],
+            'purchase_information' => [
+                'id'             => 1,
+                'msrp'           => 12345,
+                'price'          => 65432,
+                'sales_tax_rate' => 6.225,
+                'document_fee'   => 259,
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonMissing(['23456.00'])
+            ->assertJsonFragment(['65432.00']);
+    }
+
+    /** @test * */
+    function it_creates_units_when_updating_deal_if_non_present_else_updates_existing_units()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'units' => [
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+                ],
+            ]
+        ]))
+            ->assertStatus(201);
+
+        $this->json('PUT', '/api/deal/1', $this->validParams([
+            'customer' => ['id' => 1],
+            'units'    => [
+                [
+                    'id'           => 1,
+                    'stock_number' => 'Y987654',
+                    'year'         => 2018,
+                    'make'         => 'honda',
+                    'odometer'     => 1,
+                ],
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'suzuki',
+                    'odometer'     => 1,
+                ]
+            ]
+        ]))
+            ->assertStatus(201)
+            ->assertJsonMissing(['yamaha'])
+            ->assertJsonFragment(['suzuki'])
+            ->assertJsonFragment(['honda']);
+    }
+
+    /** @test * */
+    function it_updates_the_deal()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams())
+            ->assertStatus(201);
+
+        $this->json('PUT', '/api/deal/1', $this->validParams([
+            'customer'      => ['id' => 1],
+            'sales_status'  => 'Investigation',
+            'customer_type' => ['Walk-in']
+        ]))
+            ->assertStatus(201)
+            ->assertJsonFragment(['Investigation'])
+            ->assertJsonFragment(['["Walk-in"]']);
+    }
 }

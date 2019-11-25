@@ -29,9 +29,9 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::group(['prefix' => 'deal'], function () {
         Route::get('', 'DealController@index')->name('all.deals');
         Route::post('', 'DealController@store')->name('store.deal');
-        Route::put('/{deal}', 'DealController@index')->name('update.deal');
-        Route::get('/{deal}', 'DealController@index')->name('show.deal');
-        Route::delete('/{deal}', 'DealController@index')->name('delete.deal');
+        Route::put('/{deal}', 'DealController@update')->name('update.deal');
+        Route::get('/{deal}', 'DealController@show')->name('show.deal');
+        Route::delete('/{deal}', 'DealController@delete')->name('delete.deal');
 
         Route::get('options', 'DealOptionsController@index')->name('deal.options');
     });

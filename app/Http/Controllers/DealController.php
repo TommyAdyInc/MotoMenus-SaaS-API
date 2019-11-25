@@ -87,6 +87,66 @@ class DealController extends Controller
         }
     }
 
+    public function update(Deal $deal)
+    {
+        $this->validateUpdate($deal);
+
+        try {
+            if (!isAdmin() && $deal->user_id != auth()->id()) {
+                throw new \Exception('Only allowed to update own deals.');
+            }
+
+            $user = auth()->user();
+
+            if (isAdmin() && request()->get('user_id') != auth()->id()) {
+                $user = User::find(request()->get('user_id'));
+            }
+
+            $customer = request()->has('customer.id')
+                ? Customer::find(request()->get('customer')['id'])
+                : $user->customers()->create(request()->get('customer'));
+
+            if ($customer->user_id != $deal->user_id) {
+                throw new \Exception('Customer must belong to user');
+            }
+
+            $customer->update(request()->get('customer'));
+            $deal->update(request()->all());
+            $deal->updateRelatedModules();
+
+            return response()->json($deal->load('customer', 'accessories', 'units', 'trades', 'payment_schedule',
+                'finance_insurance', 'purchase_information'), 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function show(Deal $deal)
+    {
+        try {
+            if (!isAdmin() && $deal->user_id != auth()->id()) {
+                throw new \Exception('Can only view own deals.');
+            }
+
+            return response()->json($deal, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function delete(Deal $deal)
+    {
+        try {
+            if (!isAdmin() && $deal->user_id != auth()->id()) {
+                throw new \Exception('Can only delete own deals.');
+            }
+
+            return response()->json($deal->delete(), 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
     private function validateStore()
     {
         // adding validation rules to controller instead of Request for ease of access
@@ -104,13 +164,10 @@ class DealController extends Controller
             ],
             'customer'                                                => ['required', 'array'],
             'customer.id'                                             => ['exists:tenant.customers,id'],
-            'customer.first_name'                                     => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.last_name'                                      => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.phone'                                          => [empty(request()->get('customer')['id']) ? 'required' : ''],
-            'customer.email'                                          => [
-                empty(request()->get('customer')['id']) ? 'required' : '',
-                'email'
-            ],
+            'customer.first_name'                                     => ['required_with:customer.id'],
+            'customer.last_name'                                      => ['required_with:customer.id'],
+            'customer.phone'                                          => ['required_with:customer.id'],
+            'customer.email'                                          => ['required_with:customer.id', 'email'],
             'accessories'                                             => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
             'accessories.*.item_name'                                 => ['required', 'string'],
@@ -132,7 +189,120 @@ class DealController extends Controller
                     config('sale_status')
                 )
             ],
-            'customer_type'                                           => [
+            'customer_type'                                           => ['bail',
+                'array',
+                function ($attribute, $value, $fail) {
+                    if (count(array_diff($value, config('customer_types'))) > 0) {
+                        $fail('Customer types must match any of ' . join(',', config('customer_types')));
+                    }
+                }
+            ],
+            'payment_schedule'                                        => ['array'],
+            'payment_schedule.rate'                                   => ['required_with:payment_schedule', 'numeric'],
+            'payment_schedule.payment_options.down_payment_options'   => ['array'],
+            'payment_schedule.payment_options.down_payment_options.*' => ['numeric'],
+            'payment_schedule.payment_options.months'                 => ['array'],
+            'payment_schedule.payment_options.months.*'               => [
+                'numeric',
+                Rule::in(config('payment_months'))
+            ],
+            'finance_insurance'                                       => ['array'],
+            'finance_insurance.cash_down_payment'                     => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.preferred_standard_rate'               => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.preferred_standard_term'               => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.promotional_rate'                      => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.promotional_term'                      => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.full_protection'                       => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.limited_protection'                    => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.tire_wheel'                            => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.gap_coverage'                          => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.theft'                                 => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.priority_maintenance'                  => ['nullable', 'numeric', 'min:0'],
+            'finance_insurance.appearance_protection'                 => ['nullable', 'numeric', 'min:0'],
+            'purchase_information'                                    => ['array'],
+            'purchase_information.msrp'                               => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.price'                              => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.manufacturer_freight'               => ['nullable', 'numeric'],
+            'purchase_information.technician_setup'                   => ['nullable', 'numeric'],
+            'purchase_information.accessories'                        => ['nullable', 'numeric'],
+            'purchase_information.accessories_labor'                  => ['nullable', 'numeric'],
+            'purchase_information.labor'                              => ['nullable', 'numeric'],
+            'purchase_information.riders_edge_course'                 => ['nullable', 'numeric'],
+            'purchase_information.miscellaneous_costs'                => ['nullable', 'numeric'],
+            'purchase_information.document_fee'                       => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.trade_in_allowance'                 => ['nullable', 'numeric'],
+            'purchase_information.sales_tax_rate'                     => [
+                'required_with:purchase_information',
+                'numeric'
+            ],
+            'purchase_information.payoff_balance_owed'                => ['nullable', 'numeric'],
+            'purchase_information.title_trip_fee'                     => ['nullable', 'numeric'],
+            'purchase_information.deposit'                            => ['nullable', 'numeric'],
+            'purchase_information.taxable_show_msrp_on_pdf'           => ['nullable', 'boolean'],
+            'purchase_information.taxable_price'                      => ['nullable', 'boolean'],
+            'purchase_information.taxable_manufacturer_freight'       => ['nullable', 'boolean'],
+            'purchase_information.taxable_technician_setup'           => ['nullable', 'boolean'],
+            'purchase_information.taxable_accessories'                => ['nullable', 'boolean'],
+            'purchase_information.taxable_accessories_labor'          => ['nullable', 'boolean'],
+            'purchase_information.taxable_labor'                      => ['nullable', 'boolean'],
+            'purchase_information.taxable_riders_edge_course'         => ['nullable', 'boolean'],
+            'purchase_information.taxable_miscellaneous_costs'        => ['nullable', 'boolean'],
+            'purchase_information.taxable_document_fee'               => ['nullable', 'boolean'],
+            'purchase_information.tax_credit_on_trade'                => ['nullable', 'boolean'],
+        ]);
+    }
+
+    private function validateUpdate($deal)
+    {
+        // adding validation rules to controller instead of Request for ease of access
+        // and not having to rely on Request injection
+
+        request()->validate([
+            'user_id'                                                 => [
+                'exists:tenant.users,id',
+                function ($attribute, $value, $fail) {
+                    if (!isAdmin() && $value != auth()->id()) {
+                        $fail('User not allowed to create deal for other user');
+                    }
+                }
+            ],
+            'customer'                                                => ['array'],
+            'customer.id'                                             => [
+                'required_with:customer',
+                'exists:tenant.customers,id',
+            ],
+            'customer.email'                                          => ['email'],
+            'accessories'                                             => ['nullable', 'array'],
+            // Array of one or more accessories. May be submitted as empty value and will then be ignored
+            'accessories.*.item_name'                                 => ['string'],
+            'accessories.*.msrp'                                      => ['numeric', 'min:0'],
+            'accessories.*.labor'                                     => ['numeric', 'min:0'],
+            'accessories.*.unit_price'                                => ['numeric', 'min:0'],
+            'accessories.*.quantity'                                  => ['integer', 'min:1'],
+            'units'                                                   => ['nullable', 'array'],
+            // Array of one or more units. May be submitted as empty value and will then be ignored
+            'units.*.odometer'                                        => ['numeric', 'min:0'],
+            'units.*.year'                                            => ['integer'],
+            'trades'                                                  => ['nullable', 'array'],
+            // Array of one or more trades. May be submitted as empty value and will then be ignored
+            'trades.*.odometer'                                       => ['numeric', 'min:0'],
+            'trades.*.year'                                           => ['integer'],
+            'sales_status'                                            => [
+                'required',
+                Rule::in(
+                    config('sale_status')
+                )
+            ],
+            'customer_type'                                           => ['bail',
                 'array',
                 function ($attribute, $value, $fail) {
                     if (count(array_diff($value, config('customer_types'))) > 0) {
