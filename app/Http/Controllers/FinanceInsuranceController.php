@@ -7,6 +7,11 @@ use App\FinanceInsurance;
 
 class FinanceInsuranceController extends Controller
 {
+    /**
+     * @param Deal $deal
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Deal $deal)
     {
         request()->validate([
@@ -39,6 +44,12 @@ class FinanceInsuranceController extends Controller
         }
     }
 
+    /**
+     * @param Deal             $deal
+     * @param FinanceInsurance $finance_insurance
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Deal $deal, FinanceInsurance $finance_insurance)
     {
         request()->validate([
@@ -71,6 +82,12 @@ class FinanceInsuranceController extends Controller
         }
     }
 
+    /**
+     * @param Deal             $deal
+     * @param FinanceInsurance $finance_insurance
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(Deal $deal, FinanceInsurance $finance_insurance)
     {
         try {

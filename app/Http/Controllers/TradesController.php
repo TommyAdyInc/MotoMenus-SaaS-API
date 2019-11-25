@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class TradesController extends Controller
 {
+    /**
+     * @param Deal $deal
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Deal $deal)
     {
         request()->validate([
@@ -35,6 +40,12 @@ class TradesController extends Controller
         }
     }
 
+    /**
+     * @param Deal  $deal
+     * @param Trade $trade
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Deal $deal, Trade $trade)
     {
         request()->validate([
@@ -57,6 +68,12 @@ class TradesController extends Controller
         }
     }
 
+    /**
+     * @param Deal  $deal
+     * @param Trade $trade
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(Deal $deal, Trade $trade)
     {
         try {

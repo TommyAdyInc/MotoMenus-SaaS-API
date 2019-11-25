@@ -9,6 +9,11 @@ use Illuminate\Validation\Rule;
 
 class PaymentScheduleController extends Controller
 {
+    /**
+     * @param Deal $deal
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Deal $deal)
     {
         request()->validate([
@@ -37,6 +42,12 @@ class PaymentScheduleController extends Controller
         }
     }
 
+    /**
+     * @param Deal            $deal
+     * @param PaymentSchedule $payment_schedule
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Deal $deal, PaymentSchedule $payment_schedule)
     {
         request()->validate([
@@ -65,6 +76,12 @@ class PaymentScheduleController extends Controller
         }
     }
 
+    /**
+     * @param Deal            $deal
+     * @param PaymentSchedule $payment_schedule
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(Deal $deal, PaymentSchedule $payment_schedule)
     {
         try {

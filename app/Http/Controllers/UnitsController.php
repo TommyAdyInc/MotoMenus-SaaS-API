@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class UnitsController extends Controller
 {
+    /**
+     * @param Deal $deal
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Deal $deal)
     {
         request()->validate([

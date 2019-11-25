@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class PurchaseInformationController extends Controller
 {
+    /**
+     * @param Deal $deal
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Deal $deal)
     {
         request()->validate([
@@ -53,6 +58,12 @@ class PurchaseInformationController extends Controller
         }
     }
 
+    /**
+     * @param Deal                $deal
+     * @param PurchaseInformation $purchase_information
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Deal $deal, PurchaseInformation $purchase_information)
     {
         request()->validate([
@@ -98,6 +109,12 @@ class PurchaseInformationController extends Controller
         }
     }
 
+    /**
+     * @param Deal                $deal
+     * @param PurchaseInformation $purchase_information
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(Deal $deal, PurchaseInformation $purchase_information)
     {
         try {
