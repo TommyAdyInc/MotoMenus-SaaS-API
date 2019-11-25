@@ -450,4 +450,50 @@ class DealsTest extends TestCase
             ->assertJsonFragment(['Investigation'])
             ->assertJsonFragment(['["Walk-in"]']);
     }
+
+    /** @test * */
+    function purchase_information_can_be_updated_individually()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'purchase_information' => [
+                'msrp'           => 12345,
+                'price'          => 23456,
+                'sales_tax_rate' => 6.225,
+                'document_fee'   => 259,
+            ]
+        ]))
+            ->assertStatus(201);
+
+        $this->json('PUT', '/api/purchase-information/1/1', [
+            'msrp' => 54321,
+        ])
+            ->assertStatus(201);
+    }
+
+    /** @test * */
+    function cannot_create_purchase_information_individually_when_already_exists()
+    {
+        Passport::actingAs($this->user);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'purchase_information' => [
+                'msrp'           => 12345,
+                'price'          => 23456,
+                'sales_tax_rate' => 6.225,
+                'document_fee'   => 259,
+            ]
+        ]))
+            ->assertStatus(201);
+
+        $this->json('POST', '/api/purchase-information/1', [
+            'msrp'           => 12345,
+            'price'          => 23456,
+            'sales_tax_rate' => 6.225,
+            'document_fee'   => 259,
+        ])
+            ->assertStatus(422)
+            ->assertJsonFragment(['Purchase information already exists on the deal. To make changes please use update api.']);
+    }
 }

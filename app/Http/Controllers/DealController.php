@@ -170,7 +170,7 @@ class DealController extends Controller
             'customer.email'                                          => ['required_with:customer.id', 'email'],
             'accessories'                                             => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
-            'accessories.*.item_name'                                 => ['required', 'string'],
+            'accessories.*.item_name'                                 => ['required_with:accessories', 'string'],
             'accessories.*.msrp'                                      => ['numeric', 'min:0'],
             'accessories.*.labor'                                     => ['numeric', 'min:0'],
             'accessories.*.unit_price'                                => ['numeric', 'min:0'],
@@ -235,10 +235,6 @@ class DealController extends Controller
             'purchase_information.labor'                              => ['nullable', 'numeric'],
             'purchase_information.riders_edge_course'                 => ['nullable', 'numeric'],
             'purchase_information.miscellaneous_costs'                => ['nullable', 'numeric'],
-            'purchase_information.document_fee'                       => [
-                'required_with:purchase_information',
-                'numeric'
-            ],
             'purchase_information.trade_in_allowance'                 => ['nullable', 'numeric'],
             'purchase_information.sales_tax_rate'                     => [
                 'required_with:purchase_information',
@@ -348,10 +344,6 @@ class DealController extends Controller
             'purchase_information.labor'                              => ['nullable', 'numeric'],
             'purchase_information.riders_edge_course'                 => ['nullable', 'numeric'],
             'purchase_information.miscellaneous_costs'                => ['nullable', 'numeric'],
-            'purchase_information.document_fee'                       => [
-                'required_with:purchase_information',
-                'numeric'
-            ],
             'purchase_information.trade_in_allowance'                 => ['nullable', 'numeric'],
             'purchase_information.sales_tax_rate'                     => [
                 'required_with:purchase_information',

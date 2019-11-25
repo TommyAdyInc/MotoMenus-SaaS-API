@@ -95,9 +95,13 @@ class Deal extends Model
         }
 
         // add Purchase information to deal
+        // TODO: retrieve document fee specified in system options
         if (request()->has('purchase_information')) {
             if ($this->hasFilledFields(request()->get('purchase_information'))) {
-                $this->purchase_information()->create(request()->get('purchase_information'));
+                $this->purchase_information()->create(array_merge(
+                        collect(request()->get('purchase_information'))->except('document_fee')->all(),
+                        ['document_fee' => 259])
+                );
             }
         }
 
