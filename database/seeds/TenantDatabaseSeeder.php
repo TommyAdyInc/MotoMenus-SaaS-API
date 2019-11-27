@@ -1,8 +1,9 @@
 <?php
 
+use App\StoreSetting;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class TenantDatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
@@ -11,6 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(GlobalSettingsSeeder::class);
+        $this->call(StoreSetting::class);
+        $this->call(UserSeeder::class);
     }
 }

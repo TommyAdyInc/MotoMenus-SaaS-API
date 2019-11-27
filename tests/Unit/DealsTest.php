@@ -155,12 +155,14 @@ class DealsTest extends TestCase
     /** @test * */
     function sales_status_must_be_one_of_valid_options()
     {
+        Passport::actingAs($this->user);
+
         $this->json('POST', '/api/deal', $this->validParams(['sales_status' => 'F&I']))
             ->assertStatus(201);
 
         $this->json('POST', '/api/deal', $this->validParams(['sales_status' => 'Not valid status']))
             ->assertStatus(422)
-            ->assertJsonFragment(['The selected sale status is invalid.']);
+            ->assertJsonFragment(['The selected sales status is invalid.']);
     }
 
     /** @test * */
@@ -169,27 +171,36 @@ class DealsTest extends TestCase
         Passport::actingAs($this->user);
 
         $this->json('POST', '/api/deal', $this->validParams([
-            'payment_options' => 'not an array'
-        ]))
-            ->assertStatus(422)
-            ->assertJsonFragment(['The payment options must be an array.']);
-
-
-        $this->json('POST', '/api/deal', $this->validParams([
-            'payment_options' => [
-                'down_payment_options' => [1000, 2000, 'not a number']
+            'payment_schedule' => [
+                'rate'            => 13.49,
+                'payment_options' => 'not an array'
             ]
         ]))
             ->assertStatus(422)
-            ->assertJsonFragment(['The payment_options.down_payment_options.2 must be a number.']);
+            ->assertJsonFragment(['The payment schedule.payment options must be an array.']);
+
 
         $this->json('POST', '/api/deal', $this->validParams([
-            'payment_options' => [
-                'months' => [65]
+            'payment_schedule' => [
+                'rate'            => 13.49,
+                'payment_options' => [
+                    'down_payment_options' => [1000, 2000, 'not a number']
+                ]
             ]
         ]))
             ->assertStatus(422)
-            ->assertJsonFragment(['The selected payment_options.months.0 is invalid.']);
+            ->assertJsonFragment(['The payment_schedule.payment_options.down_payment_options.2 must be a number.']);
+
+        $this->json('POST', '/api/deal', $this->validParams([
+            'payment_schedule' => [
+                'rate'            => 13.49,
+                'payment_options' => [
+                    'months' => [65]
+                ]
+            ]
+        ]))
+            ->assertStatus(422)
+            ->assertJsonFragment(['The selected payment_schedule.payment_options.months.0 is invalid.']);
     }
 
     /** @test * */
@@ -331,11 +342,20 @@ class DealsTest extends TestCase
         Passport::actingAs($this->user);
 
         $this->json('POST', '/api/deal', $this->validParams([
-            'purchase_information' => [
-                'msrp'           => 12345,
-                'price'          => 23456,
-                'sales_tax_rate' => 6.225,
-                'document_fee'   => 259,
+            'units' => [
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+
+                    'purchase_information' => [
+                        'msrp'           => 12345,
+                        'price'          => 23456,
+                        'sales_tax_rate' => 6.225,
+                        'document_fee'   => 259,
+                    ]
+                ]
             ]
         ]))
             ->assertStatus(201)
@@ -366,25 +386,39 @@ class DealsTest extends TestCase
             ->assertStatus(201);
 
         $this->json('PUT', '/api/deal/1', $this->validParams([
-            'customer'             => ['id' => 1],
-            'purchase_information' => [
-                'msrp'           => 12345,
-                'price'          => 23456,
-                'sales_tax_rate' => 6.225,
-                'document_fee'   => 259,
+            'customer' => ['id' => 1],
+            'units'    => [
+                [
+                    'stock_number'         => 'Y123456',
+                    'year'                 => 2018,
+                    'make'                 => 'yamaha',
+                    'odometer'             => 1,
+                    'purchase_information' => [
+                        'msrp'           => 12345,
+                        'price'          => 23456,
+                        'sales_tax_rate' => 6.225,
+                        'document_fee'   => 259,
+                    ]
+                ],
             ]
         ]))
             ->assertStatus(201)
             ->assertJsonFragment(['23456.00']);
 
         $this->json('PUT', '/api/deal/1', $this->validParams([
-            'customer'             => ['id' => 1],
-            'purchase_information' => [
-                'id'             => 1,
-                'msrp'           => 12345,
-                'price'          => 65432,
-                'sales_tax_rate' => 6.225,
-                'document_fee'   => 259,
+            'customer' => ['id' => 1],
+            'units'    => [
+                [
+                    'id'                   => 1,
+                    'stock_number'         => 'Y123456',
+                    'year'                 => 2018,
+                    'make'                 => 'yamaha',
+                    'odometer'             => 1,
+                    'purchase_information' => [
+                        'id'    => 1,
+                        'price' => 65432,
+                    ]
+                ],
             ]
         ]))
             ->assertStatus(201)
@@ -457,16 +491,24 @@ class DealsTest extends TestCase
         Passport::actingAs($this->user);
 
         $this->json('POST', '/api/deal', $this->validParams([
-            'purchase_information' => [
-                'msrp'           => 12345,
-                'price'          => 23456,
-                'sales_tax_rate' => 6.225,
-                'document_fee'   => 259,
+            'units' => [
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+                    'purchase_information' => [
+                        'msrp'           => 12345,
+                        'price'          => 23456,
+                        'sales_tax_rate' => 6.225,
+                        'document_fee'   => 259,
+                    ]
+                ],
             ]
         ]))
             ->assertStatus(201);
 
-        $this->json('PUT', '/api/purchase-information/1/1', [
+        $this->json('PUT', '/api/purchase-information/1/1/1', [
             'msrp' => 54321,
         ])
             ->assertStatus(201);
@@ -478,16 +520,25 @@ class DealsTest extends TestCase
         Passport::actingAs($this->user);
 
         $this->json('POST', '/api/deal', $this->validParams([
-            'purchase_information' => [
-                'msrp'           => 12345,
-                'price'          => 23456,
-                'sales_tax_rate' => 6.225,
-                'document_fee'   => 259,
+            'units' => [
+                [
+                    'stock_number' => 'Y123456',
+                    'year'         => 2018,
+                    'make'         => 'yamaha',
+                    'odometer'     => 1,
+
+                    'purchase_information' => [
+                        'msrp'           => 12345,
+                        'price'          => 23456,
+                        'sales_tax_rate' => 6.225,
+                        'document_fee'   => 259,
+                    ]
+                ],
             ]
         ]))
             ->assertStatus(201);
 
-        $this->json('POST', '/api/purchase-information/1', [
+        $this->json('POST', '/api/purchase-information/1/1', [
             'msrp'           => 12345,
             'price'          => 23456,
             'sales_tax_rate' => 6.225,

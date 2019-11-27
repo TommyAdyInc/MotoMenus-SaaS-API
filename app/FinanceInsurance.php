@@ -2,10 +2,13 @@
 
 namespace App;
 
+use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
 
 class FinanceInsurance extends Model
 {
+    use UsesTenantConnection;
+
     protected $fillable = [
         'cash_down_payment',
         'preferred_standard_rate',

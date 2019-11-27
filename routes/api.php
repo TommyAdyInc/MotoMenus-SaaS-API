@@ -55,9 +55,9 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::group(['prefix' => 'purchase-information'], function () {
-        Route::post('/{deal}', 'PurchaseInformationController@store')->name('create.purchase.information');
-        Route::put('/{deal}/{purchase_information}', 'PurchaseInformationController@update')->name('update.purchase.information');
-        Route::delete('/{deal}/{purchase_information}', 'PurchaseInformationController@store')->name('delete.purchase.information');
+        Route::post('/{deal}/{unit}', 'PurchaseInformationController@store')->name('create.purchase.information');
+        Route::put('/{deal}/{unit}/{purchase_information}', 'PurchaseInformationController@update')->name('update.purchase.information');
+        Route::delete('/{deal}/{unit}/{purchase_information}', 'PurchaseInformationController@store')->name('delete.purchase.information');
     });
 
     Route::group(['prefix' => 'trades'], function () {
@@ -88,6 +88,13 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
     });
 });
 
+//Routes for Super Admin users
+Route::group(['middleware' => ['auth:api', 'auth.super.admin']], function () {
+    Route::group(['prefix' => 'global-settings'], function () {
+        Route::get('', 'GlobalSettingController@index')->name('get.global.settings');
+        Route::put('', 'GlobalSettingController@store')->name('update.global.settings');
+    });
+});
 
 Route::get('health-check', function () {
     return response()->json([

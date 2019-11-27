@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Deal extends Model
 {
+    use UsesTenantConnection;
+
     protected $fillable = [
         'customer_id',
         'user_id',
@@ -20,8 +23,7 @@ class Deal extends Model
         'accessories',
         'finance_insurance',
         'payment_schedule',
-        'purchase_information',
-        'units',
+        'units.purchase_information',
         'trades',
     ];
 
@@ -45,11 +47,6 @@ class Deal extends Model
         return $this->hasOne(PaymentSchedule::class);
     }
 
-    public function purchase_information(): hasOne
-    {
-        return $this->hasOne(PurchaseInformation::class);
-    }
-
     public function trades(): hasMany
     {
         return $this->hasMany(Trade::class);
@@ -69,9 +66,21 @@ class Deal extends Model
     {
         // add any Units to deal
         if (request()->has('units')) {
-            collect(request()->get('units'))->each(function ($unit) {
+            $document_fee = GlobalSetting::first()->document_fee;
+
+            collect(request()->get('units'))->each(function ($unit) use ($document_fee) {
                 if ($this->hasFilledFields($unit)) {
-                    $this->units()->create($unit);
+                    $u = $this->units()->create($unit);
+
+                    // add Purchase information to unit
+                    if (isset($unit['purchase_information'])) {
+                        if ($this->hasFilledFields($unit['purchase_information'])) {
+                            $u->purchase_information()->create(array_merge(
+                                    collect($unit['purchase_information'])->except('document_fee')->all(),
+                                    ['document_fee' => $document_fee])
+                            );
+                        }
+                    }
                 }
             });
         }
@@ -94,17 +103,6 @@ class Deal extends Model
             });
         }
 
-        // add Purchase information to deal
-        // TODO: retrieve document fee specified in system options
-        if (request()->has('purchase_information')) {
-            if ($this->hasFilledFields(request()->get('purchase_information'))) {
-                $this->purchase_information()->create(array_merge(
-                        collect(request()->get('purchase_information'))->except('document_fee')->all(),
-                        ['document_fee' => 259])
-                );
-            }
-        }
-
         // add payment schedule to deal
         if (request()->has('payment_schedule')) {
             if ($this->hasFilledFields(request()->get('payment_schedule'))) {
@@ -124,12 +122,27 @@ class Deal extends Model
     {
         // add and update any Units to deal
         if (request()->has('units')) {
-            collect(request()->get('units'))->each(function ($unit) {
+            $document_fee = GlobalSetting::first()->document_fee;
+
+            collect(request()->get('units'))->each(function ($unit) use ($document_fee) {
                 if ($this->hasFilledFields($unit)) {
                     if (isset($unit['id'])) {
-                        $this->units()->where('units.id', $unit['id'])->update($unit);
+                        $u = tap($this->units()->where('units.id',
+                            $unit['id']))->update(collect($unit)->only((new Unit)->getFillable())->all())->first();
                     } else {
-                        $this->units()->create($unit);
+                        $u = $this->units()->create($unit);
+                    }
+                    if ($u && isset($unit['purchase_information'])) {
+                        if ($this->hasFilledFields($unit['purchase_information'])) {
+                            if (!isset($unit['purchase_information']['id'])) {
+                                $u->purchase_information()->create(
+                                    array_merge(collect($unit['purchase_information'])->except('document_fee')->all(),
+                                        ['document_fee' => $document_fee])
+                                );
+                            } else {
+                                $u->purchase_information()->update(collect($unit['purchase_information'])->except('document_fee')->all());
+                            }
+                        }
                     }
                 }
             });
@@ -159,14 +172,6 @@ class Deal extends Model
                     }
                 }
             });
-        }
-
-        // add/update Purchase information to deal
-        if (request()->has('purchase_information')) {
-            if ($this->hasFilledFields(request()->get('purchase_information'))) {
-                $this->purchase_information()->updateOrCreate(request()->get('purchase_information.id') ?? [],
-                    request()->get('purchase_information'));
-            }
         }
 
         // add/update payment schedule to deal

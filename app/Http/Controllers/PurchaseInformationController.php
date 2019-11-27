@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Deal;
 use App\PurchaseInformation;
+use App\Unit;
 use Illuminate\Http\Request;
 
 class PurchaseInformationController extends Controller
@@ -13,7 +14,7 @@ class PurchaseInformationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Deal $deal)
+    public function store(Deal $deal, Unit $unit)
     {
         request()->validate([
             'msrp'                         => ['required', 'numeric'],
@@ -48,11 +49,11 @@ class PurchaseInformationController extends Controller
                 throw new \Exception('Can only create purchase information for own deal');
             }
 
-            if($deal->has('purchase_information')) {
+            if($unit->has('purchase_information')) {
                 throw new \Exception('Purchase information already exists on the deal. To make changes please use update api.');
             }
 
-            return response()->json($deal->purchase_information()->create(request()->all()), 201);
+            return response()->json($unit->purchase_information()->create(request()->all()), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -64,7 +65,7 @@ class PurchaseInformationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Deal $deal, PurchaseInformation $purchase_information)
+    public function update(Deal $deal, Unit $unit, PurchaseInformation $purchase_information)
     {
         request()->validate([
             'msrp'                         => ['numeric'],
@@ -99,8 +100,12 @@ class PurchaseInformationController extends Controller
                 throw new \Exception('Can only update purchase information for own deal');
             }
 
-            if ($deal->id != $purchase_information->deal_id) {
-                throw new \Exception('Purchase information does not belong to the deal');
+            if ($deal->id != $unit->deal_id) {
+                throw new \Exception('Unit does not belong to the deal');
+            }
+
+            if ($unit->id != $purchase_information->unit_id) {
+                throw new \Exception('Purchase information does not belong to the unit');
             }
 
             return response()->json($purchase_information->update(request()->all()), 201);
@@ -115,15 +120,19 @@ class PurchaseInformationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(Deal $deal, PurchaseInformation $purchase_information)
+    public function delete(Deal $deal, Unit $unit, PurchaseInformation $purchase_information)
     {
         try {
             if (!isAdmin() && $deal->user_id != auth()->id()) {
                 throw new \Exception('Can only delete purchase information from own deal');
             }
 
-            if ($deal->id != $purchase_information->deal_id) {
-                throw new \Exception('Purchase information does not belong to the deal');
+            if ($deal->id != $unit->deal_id) {
+                throw new \Exception('Unit does not belong to the deal');
+            }
+
+            if ($unit->id != $purchase_information->unit_id) {
+                throw new \Exception('Purchase information does not belong to the unit');
             }
 
             return response()->json($purchase_information->delete(), 201);

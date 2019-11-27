@@ -2,10 +2,13 @@
 
 namespace App;
 
+use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
 
 class Trade extends Model
 {
+    use UsesTenantConnection;
+
     protected $fillable = [
         'vin',
         'year',
