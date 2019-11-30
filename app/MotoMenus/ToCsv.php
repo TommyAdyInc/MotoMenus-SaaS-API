@@ -19,11 +19,10 @@ class ToCSV
         $this->filename = $filename;
     }
 
-    public function getCSV(): void
+    public function getCSV(): string
     {
-        $this->download_send_headers();
-        echo $this->array2csv();
-        die();
+        // $this->download_send_headers();
+        return $this->array2csv();
     }
 
     private function download_send_headers(): void

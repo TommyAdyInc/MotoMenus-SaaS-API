@@ -28,7 +28,7 @@ class Customer extends Model
 
     protected $with = ['note', 'user'];
 
-    public function deals() :hasMany
+    public function deals(): hasMany
     {
         return $this->hasMany(Deal::class);
     }
@@ -58,7 +58,7 @@ class Customer extends Model
         collect($this->fillable)
             ->each(function ($field) use (&$query) {
                 if ($this->requestHas($field)) {
-                    if($field == 'user_id') {
+                    if ($field == 'user_id') {
                         $query->whereUserId($field);
                     } else {
                         $query->where($field, 'LIKE', '%' . request()->get($field) . '%');
@@ -72,5 +72,15 @@ class Customer extends Model
     private function requestHas($field)
     {
         return request()->has($field) && !empty(request()->get($field));
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->first_name . (!empty($this->middle_name) ? (' ' . $this->middle_name[0]) : '') . ' ' . $this->last_name;
+    }
+
+    public function getCityStateAttribute()
+    {
+        return $this->city . ', ' . $this->state . ' ' . $this->postcode;
     }
 }

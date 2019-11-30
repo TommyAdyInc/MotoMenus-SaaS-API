@@ -26,6 +26,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::group(['prefix' => 'customers'], function () {
+        Route::get('/export', 'ExportCustomerListController@index')->name('export.customer.list');
+
         Route::get('', 'CustomerController@index')->name('get.customers');
         Route::post('', 'CustomerController@store')->name('create.new.customer');
         Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
@@ -78,6 +80,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');
+    Route::get('pdf/{deal}', 'DownloadPdfController@create')->name('download.pdf');
 });
 
 //Routes for Tenant Admin users

@@ -14,7 +14,3 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::group(['middleware' => ['auth:api']], function() {
-    Route::get('customers/export', 'ExportCustomerListController@index')->name('export.customer.list');
-});
