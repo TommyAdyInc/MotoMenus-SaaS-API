@@ -6,7 +6,7 @@
  * Time: 10:10 AM
  */
 
-namespace App\Moto;
+namespace App\MotoMenus;
 
 
 class PaymentsCalculation

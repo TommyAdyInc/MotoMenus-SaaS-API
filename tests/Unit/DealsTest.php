@@ -261,16 +261,20 @@ class DealsTest extends TestCase
         $this->json('POST', '/api/deal', $this->validParams([
             'trades' => [
                 [
-                    'vin'      => 'YT123456',
-                    'year'     => 2018,
-                    'make'     => 'yamaha',
-                    'odometer' => 1,
+                    'vin'            => 'YT123456',
+                    'year'           => 2018,
+                    'make'           => 'yamaha',
+                    'odometer'       => 3456,
+                    'trade_in_value' => 3000,
+                    'book_value'     => 3500
                 ],
                 [
-                    'vin'      => 'YT987654',
-                    'year'     => 2018,
-                    'make'     => 'yamaha',
-                    'odometer' => 1,
+                    'vin'            => 'YT987654',
+                    'year'           => 2018,
+                    'make'           => 'yamaha',
+                    'odometer'       => 3456,
+                    'trade_in_value' => 3000,
+                    'book_value'     => 3500
                 ]
             ]
         ]))
@@ -290,11 +294,15 @@ class DealsTest extends TestCase
                     'part_number' => 'ACC12345',
                     'item_name'   => 'Item',
                     'quantity'    => 1,
+                    'unit_price'  => 20,
+                    'labor'       => 50,
                 ],
                 [
                     'part_number' => 'ACC98765',
                     'item_name'   => 'Item',
                     'quantity'    => 1,
+                    'unit_price'  => 20,
+                    'labor'       => 50,
                 ]
             ]
         ]))
@@ -344,11 +352,10 @@ class DealsTest extends TestCase
         $this->json('POST', '/api/deal', $this->validParams([
             'units' => [
                 [
-                    'stock_number' => 'Y123456',
-                    'year'         => 2018,
-                    'make'         => 'yamaha',
-                    'odometer'     => 1,
-
+                    'stock_number'         => 'Y123456',
+                    'year'                 => 2018,
+                    'make'                 => 'yamaha',
+                    'odometer'             => 1,
                     'purchase_information' => [
                         'msrp'           => 12345,
                         'price'          => 23456,
@@ -493,10 +500,10 @@ class DealsTest extends TestCase
         $this->json('POST', '/api/deal', $this->validParams([
             'units' => [
                 [
-                    'stock_number' => 'Y123456',
-                    'year'         => 2018,
-                    'make'         => 'yamaha',
-                    'odometer'     => 1,
+                    'stock_number'         => 'Y123456',
+                    'year'                 => 2018,
+                    'make'                 => 'yamaha',
+                    'odometer'             => 1,
                     'purchase_information' => [
                         'msrp'           => 12345,
                         'price'          => 23456,

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\MotoMenus\PaymentsCalculation;
 use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -261,5 +262,21 @@ class Deal extends Model
 
             return $carry;
         }, false);
+    }
+
+    public function getTotalCashBalanceAttribute()
+    {
+        return $this->units->reduce(function($total, $unit) {
+            $total += round($unit->purchase_information->cash_balance, 2);
+
+            return $total;
+        }, 0);
+    }
+
+    public function totalFinanceOptions(PaymentSchedule $payment_schedule)
+    {
+        $payments = new PaymentsCalculation($payment_schedule->payment_options['down_payment_options'], $payment_schedule->rate, $this->total_cash_balance);
+
+        return collect($payments->getPayments())->only($payment_schedule->payment_options['months']);
     }
 }
