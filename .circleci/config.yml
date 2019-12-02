@@ -16,16 +16,100 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-v4-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - run:
           name: Install Composer dependencies
           environment:
             COMPOSER_ALLOW_SUPERUSER: 1
           command: composer install --no-dev --no-interaction --no-progress --no-scripts --prefer-source --verbose
+      - run:
+          name: Update the Composer autoloader (To handle new classes in a classmap package)
+          command: composer dump-autoload --no-scripts
       - save_cache:
-          key: composer-install-v4-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          key: composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
           paths:
             - "vendor"
+      - restore_cache:
+          keys:
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - run:
+          name: Install Composer dependencies
+          environment:
+            COMPOSER_ALLOW_SUPERUSER: 1
+          command: composer install --no-interaction --no-progress --no-scripts --prefer-source --verbose
+      - run:
+          name: Update the Composer autoloader (To handle new classes in a classmap package)
+          command: composer dump-autoload --no-scripts
+      - save_cache:
+          key: composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          paths:
+            - "vendor"
+
+  generate-oauth-keys:
+    docker:
+      - image: ${AWS_ECR_ACCOUNT_URL}/motomenus-saas-api-php-fpm:latest
+    environment:
+      - BASH_ENV: /etc/profile
+    shell: /bin/sh -leo pipefail
+    working_directory: *working-directory
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - run:
+          name: Set environment variables needed in subsequent steps
+          command: |
+            echo "export APP_ENV=${CIRCLE_BRANCH}" >> $BASH_ENV
+            echo "export APP_KEY=$(php artisan key:generate --show)" >> $BASH_ENV
+      - restore_cache:
+          keys:
+            - oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          name: Create encryption keys in the /storage directory that are needed to generate secure access tokens
+          command: php artisan passport:keys
+      - save_cache:
+          key: oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - "storage/oauth-private.key"
+            - "storage/oauth-public.key"
+
+  run-unit-tests:
+    docker:
+      - image: ${AWS_ECR_ACCOUNT_URL}/motomenus-saas-api-php-fpm:latest
+        environment:
+          APP_ENV: "testing"
+          DB_HOST_SYSTEM: "127.0.0.1"
+          DB_DATABASE_SYSTEM: "000-system"
+          DB_USERNAME_SYSTEM: "root"
+          DB_PASSWORD_SYSTEM: "rootpass"
+      - image: circleci/mysql:5.7.22
+        command: mysqld --character-set-server="utf8mb4" --collation-server="utf8mb4_unicode_ci" --sql-mode="NO_ENGINE_SUBSTITUTION"
+        environment:
+          MYSQL_ROOT_HOST: "%"
+          MYSQL_ROOT_PASSWORD: "rootpass"
+          MYSQL_DATABASE: "000-system"
+    environment:
+      - BASH_ENV: /etc/profile
+    shell: /bin/sh -leo pipefail
+    working_directory: *working-directory
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - run:
+          name: Set environment variables needed in subsequent steps
+          command: echo "export APP_KEY=$(php artisan key:generate --show)" >> $BASH_ENV
+      - restore_cache:
+          keys:
+            - oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          name: Run "system" migrations
+          command: php artisan migrate --database="connection_system"
+      - run:
+          name: Run unit tests
+          command: vendor/bin/phpunit
 
   build-and-push-image:
     executor: aws-cli/default
@@ -34,9 +118,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-v4-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
-      - aws-cli/setup
+            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+      - restore_cache:
+          keys:
+            - oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
       - aws-ecr/build-and-push-image:
+          checkout: false
           create-repo: true
           region: AWS_DEFAULT_REGION
           repo: $(echo "$CIRCLE_PROJECT_REPONAME" | tr '[:upper:]' '[:lower:]')
@@ -50,7 +137,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Set any environment variables needed in subsequent steps
+          name: Set environment variables needed in subsequent steps
           command: |
             set -x
             # Lowercase the repo name.
@@ -94,6 +181,17 @@ workflows:
     jobs:
       - composer-install
 
+      - generate-oauth-keys:
+          context: "org-global"
+          requires:
+            - composer-install
+
+      - run-unit-tests:
+          context: "org-global"
+          requires:
+            - composer-install
+            - generate-oauth-keys
+
       - build-and-push-image:
           context: "org-global"
           filters:
@@ -102,7 +200,7 @@ workflows:
                 - dev
                 - prod
           requires:
-            - composer-install
+            - generate-oauth-keys
 
       - make-replacements-in-task-definition:
           context: "org-global"
