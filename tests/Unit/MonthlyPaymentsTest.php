@@ -2,11 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Moto\PaymentsCalculation;
-use App\User;
-use Laravel\Passport\Passport;
+use App\MotoMenus\PaymentsCalculation;
 use Tests\TestCase;
-use UserSeeder;
 
 class MonthlyPaymentsTest extends TestCase
 {

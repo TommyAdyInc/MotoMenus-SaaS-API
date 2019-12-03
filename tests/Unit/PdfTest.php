@@ -7,7 +7,7 @@ use Laravel\Passport\Passport;
 use Tests\TestCase;
 use UserSeeder;
 
-class UsersTest extends TestCase
+class PdfTest extends TestCase
 {
     private $user;
 
@@ -113,8 +113,9 @@ class UsersTest extends TestCase
             // ->dump()
             ->assertStatus(201);
 
-        $pdf = base64_decode($response->getContent());
+        // check local if PDF created correctly
+        // $pdf = base64_decode($response->getContent());
 
-        file_put_contents(storage_path('test.pdf'), $pdf);
+        // file_put_contents(storage_path('test.pdf'), $pdf);
     }
 }
