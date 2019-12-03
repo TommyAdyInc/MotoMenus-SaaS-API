@@ -10,7 +10,7 @@ orbs:
 jobs:
   composer-install:
     docker:
-      - image: composer:1.8.6
+      - image: composer:1.9.1
     working_directory: *working-directory
     steps:
       - checkout

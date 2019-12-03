@@ -7,7 +7,7 @@ use Laravel\Passport\Passport;
 use Tests\TestCase;
 use UserSeeder;
 
-class UsersTest extends TestCase
+class PdfTest extends TestCase
 {
     private $user;
 

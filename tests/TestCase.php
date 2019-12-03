@@ -24,8 +24,8 @@ abstract class TestCase extends BaseTestCase
 
     protected static $is_first_time_through = true;
 
-    const WEBSITE_UUID = 'moto-v3-phpunit';
-    const HOSTNAME_FQDN = 'local-phpunit.dev.api.motomenus.local';
+    const WEBSITE_UUID = '000-phpunit';
+    const HOSTNAME_FQDN = 'phpunit.dev.api.motomenus.local';
     const TENANT_CUSTOMER_NAME = 'phpunit';
 
     protected function setUp() :void

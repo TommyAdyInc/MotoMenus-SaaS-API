@@ -38,7 +38,7 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST_SYSTEM', 'localhost'),
             'port' => env('DB_PORT_SYSTEM', '3306'),
-            'database' => env('DB_DATABASE_SYSTEM', '000-system-motomenus'),
+            'database' => env('DB_DATABASE_SYSTEM', '000-system'),
             'username' => env('DB_USERNAME_SYSTEM', 'root'),
             'password' => env('DB_PASSWORD_SYSTEM', 'rootpass'),
             'unix_socket' => env('DB_SOCKET_SYSTEM', ''),
