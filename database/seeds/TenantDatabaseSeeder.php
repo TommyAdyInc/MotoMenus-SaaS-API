@@ -12,7 +12,7 @@ class TenantDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(StoreSetting::class);
+        $this->call(StoreSettingsSeeder::class);
         $this->call(UserSeeder::class);
     }
 }
