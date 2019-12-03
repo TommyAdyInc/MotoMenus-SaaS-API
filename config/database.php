@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'system'),
+    'default' => env('DB_CONNECTION', 'connection_system'),
 
     /*
     |--------------------------------------------------------------------------
@@ -34,11 +34,11 @@ return [
     */
 
     'connections' => [
-        'system' => [
+        'connection_system' => [
             'driver' => 'mysql',
-            'host' => env('DB_HOST_SYSTEM', '127.0.0.1'),
+            'host' => env('DB_HOST_SYSTEM', 'localhost'),
             'port' => env('DB_PORT_SYSTEM', '3306'),
-            'database' => env('DB_DATABASE_SYSTEM', 'moto_system'),
+            'database' => env('DB_DATABASE_SYSTEM', '000-system-motomenus'),
             'username' => env('DB_USERNAME_SYSTEM', 'root'),
             'password' => env('DB_PASSWORD_SYSTEM', 'rootpass'),
             'unix_socket' => env('DB_SOCKET_SYSTEM', ''),

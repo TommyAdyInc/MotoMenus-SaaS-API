@@ -52,7 +52,8 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'domain' => env('APP_DOMAIN', 'dev.api.motomenus.local'),
+    'url' => env('APP_URL', 'http://dev.api.motomenus.local:40010'),
 
     'asset_url' => env('ASSET_URL', null),
 
