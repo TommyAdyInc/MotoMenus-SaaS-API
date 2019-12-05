@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Moto\PaymentsCalculation;
+use App\MotoMenus\PaymentsCalculation;
 use App\User;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
