@@ -79,10 +79,6 @@ jobs:
       - image: ${AWS_ECR_ACCOUNT_URL}/motomenus-saas-api-php-fpm:latest
         environment:
           APP_ENV: "testing"
-          DB_HOST_SYSTEM: "127.0.0.1"
-          DB_DATABASE_SYSTEM: "000-system"
-          DB_USERNAME_SYSTEM: "root"
-          DB_PASSWORD_SYSTEM: "rootpass"
       - image: circleci/mysql:5.7.22
         command: mysqld --character-set-server="utf8mb4" --collation-server="utf8mb4_unicode_ci" --sql-mode="NO_ENGINE_SUBSTITUTION"
         environment:

@@ -36,7 +36,7 @@ return [
     'connections' => [
         'connection_system' => [
             'driver' => 'mysql',
-            'host' => env('DB_HOST_SYSTEM', 'localhost'),
+            'host' => env('DB_HOST_SYSTEM', '127.0.0.1'),
             'port' => env('DB_PORT_SYSTEM', '3306'),
             'database' => env('DB_DATABASE_SYSTEM', '000-system'),
             'username' => env('DB_USERNAME_SYSTEM', 'root'),
