@@ -83,7 +83,7 @@ return [
          * @info If set to false will disable all tenant specific filesystem auto magic
          *       like the config, vendor overrides.
          */
-        'disk' => null,
+        'disk' => false,
 
         /**
          * Automatically generate a tenant directory based on the random id of the
@@ -125,7 +125,7 @@ return [
          *
          * @warn this must be a FQDN, these have no protocol or path!
          */
-        'default' => env('TENANCY_DEFAULT_HOSTNAME'),
+        'default' => env('TENANCY_DEFAULT_HOSTNAME', 'default.' . config('app.domain')),
         /**
          * The package is able to identify the requested hostname by itself,
          * disable to get full control (and responsibility) over hostname
@@ -173,7 +173,7 @@ return [
          * You can set a environment variable to override the default database
          * connection to - for instance - the tenant connection 'tenant'.
          */
-        'default' => env('TENANCY_DEFAULT_CONNECTION', 'system'),
+        'default' => env('TENANCY_DEFAULT_CONNECTION', 'connection_system'),
         /**
          * Used to give names to the system and tenant database connections. By
          * default we configure 'system' and 'tenant'. The tenant connection
@@ -183,7 +183,7 @@ return [
          * @var system-connection-name The database connection name to use for the global/system database.
          * @var tenant-connection-name The database connection name to use for the tenant database.
          */
-        'system-connection-name' => env('TENANCY_SYSTEM_CONNECTION_NAME', Connection::DEFAULT_SYSTEM_NAME),
+        'system-connection-name' => env('TENANCY_SYSTEM_CONNECTION_NAME', 'connection_system'),
         'tenant-connection-name' => env('TENANCY_TENANT_CONNECTION_NAME', Connection::DEFAULT_TENANT_NAME),
 
         /**
@@ -279,7 +279,7 @@ return [
          *
          * @info set to true to enable.
          */
-        'auto-delete-tenant-database' => env('TENANCY_DATABASE_AUTO_DELETE', false),
+        'auto-delete-tenant-database' => env('TENANCY_DATABASE_AUTO_DELETE', true),
 
         /**
          * Automatically delete the user needed to access the tenant database.
@@ -287,7 +287,7 @@ return [
          * @info Set to false to disable.
          * @info Only deletes in case tenant database is set to be deleted.
          */
-        'auto-delete-tenant-database-user' => env('TENANCY_DATABASE_AUTO_DELETE_USER', false),
+        'auto-delete-tenant-database-user' => env('TENANCY_DATABASE_AUTO_DELETE_USER', true),
 
         /**
          * Define a list of classes that you wish to force onto the tenant or system connection.

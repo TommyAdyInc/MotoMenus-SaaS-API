@@ -37,6 +37,17 @@ services:
         source: ./local.ini
         target: /usr/local/etc/php/conf.d/local.ini
 
+  queue:
+    command: php artisan queue:listen --timeout=10800 --tries=1 --verbose
+    image: ${AWS_ECR_ACCOUNT_URL}/${DOCKER_IMAGE_NAME_QUEUE}:latest
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+      - type: bind
+        source: ./local.ini
+        target: /usr/local/etc/php/conf.d/local.ini
+
 networks:
   local-network:
     driver: bridge
