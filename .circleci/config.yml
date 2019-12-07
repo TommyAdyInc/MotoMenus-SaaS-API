@@ -197,6 +197,7 @@ workflows:
                 - prod
           requires:
             - generate-oauth-keys
+            - run-unit-tests
 
       - make-replacements-in-task-definition:
           context: "org-global"
