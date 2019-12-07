@@ -173,7 +173,7 @@ return [
          * You can set a environment variable to override the default database
          * connection to - for instance - the tenant connection 'tenant'.
          */
-        'default' => env('TENANCY_DEFAULT_CONNECTION', 'system'),
+        'default' => env('TENANCY_DEFAULT_CONNECTION', 'connection_system'),
         /**
          * Used to give names to the system and tenant database connections. By
          * default we configure 'system' and 'tenant'. The tenant connection

@@ -26,7 +26,6 @@ abstract class TestCase extends BaseTestCase
 
     const WEBSITE_UUID = '000-phpunit';
     const HOSTNAME_FQDN = 'phpunit.dev.api.motomenus.local';
-    const TENANT_CUSTOMER_NAME = 'phpunit';
 
     protected function setUp() :void
     {
@@ -45,17 +44,11 @@ abstract class TestCase extends BaseTestCase
 
         try {
             $this->switchActiveTenant();
-
-            $this->truncateAllTables();
         } catch(\Exception $e) {
             dump($e->getMessage());
         }
-    }
 
-    protected function tearDown() :void
-    {
-        // Skip parent tear down as it causes issues with running all tests at once
-        // parent::tearDown();
+        $this->truncateAllTables();
     }
 
     /**
@@ -65,7 +58,7 @@ abstract class TestCase extends BaseTestCase
     {
         dump('Starting first time through tasks...');
 
-        // Create tenant if doesn't exist.
+        // Create tenant if it doesn't exist.
         $website_repository = app(WebsiteRepository::class);
         $website = $website_repository->findByUuid(self::WEBSITE_UUID);
         if ($website instanceof Website) {
@@ -98,8 +91,9 @@ abstract class TestCase extends BaseTestCase
      */
     protected function switchActiveTenant()
     {
-        dump('Switching active tenant...');
-        // ensure we have database tenant connection
+        // dump('Switching active tenant...');
+
+        // Ensure we have database tenant connection.
         config()->set('database.default', 'tenant');
 
         $tenancy = app(Environment::class);
@@ -108,16 +102,16 @@ abstract class TestCase extends BaseTestCase
 
         $hostname = $website->hostnames->first();
 
-        if(!$hostname) {
+        if (!$hostname) {
             throw new \Exception('Could not determine correct hostname.');
         }
 
         $current_hostname = $tenancy->hostname($hostname);
-        dump('Current Hostname FQDN = ' . $current_hostname->fqdn);
+        // dump('Current Hostname FQDN = ' . $current_hostname->fqdn);
 
         // Switches the tenant and reconfigures the app.
         $current_website = $tenancy->tenant($website);
-        dump('Current Website UUID = ' . $current_website->uuid);
+        // dump('Current Website UUID = ' . $current_website->uuid);
 
         $tenancy->tenant();
         $tenancy->identifyHostname();
