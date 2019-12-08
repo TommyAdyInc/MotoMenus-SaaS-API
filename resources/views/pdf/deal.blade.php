@@ -401,6 +401,31 @@
     return ($a->unit_price * $a->quantity) + $a->labor;
 }), 2)}}</td>
                 </tr>
+                @if($deal->payment_schedule->show_accessories_payments_on_pdf)
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td colspan="2">
+                            <table style="border: 1px solid #131313; float: right; width: 100%;">
+                                <tr>
+                                    <td style="border-bottom: #131313 1px solid;">Months</td>
+                                    <td style="border-bottom: #131313 1px solid;">Payments</td>
+                                </tr>
+                                @foreach(\App\Accessories::monthlyPayments($deal->accessories->sum(function($a) {
+    return ($a->unit_price * $a->quantity) + $a->labor;
+}), $deal->payment_schedule->rate, $deal->payment_schedule->payment_options['months']) as $months => $payment)
+                                    <tr>
+                                        <td>{{$months}}</td>
+                                        <td>${{number_format($payment[0], 2)}}</td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                            <br style="clear: both;">
+                        </td>
+                    </tr>
+                @endif
             </table>
         </div>
     @endif

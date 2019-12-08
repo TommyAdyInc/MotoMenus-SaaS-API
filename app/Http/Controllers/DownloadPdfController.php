@@ -26,10 +26,6 @@ class DownloadPdfController extends Controller
             $pdf = PDF::loadView('pdf.' . request()->get('type'), compact('deal', 'image'));
             $pdf->setPaper('letter');
 
-            // 'deal-' . $deal->customer->name . Carbon::now()->format('m-d-Y') .'.pdf'
-
-            // $view = View::make('pdf.' . request()->get('type'), compact('deal', 'image'));
-
             return response()->json(base64_encode($pdf->output()), 201); // $view->render()
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);

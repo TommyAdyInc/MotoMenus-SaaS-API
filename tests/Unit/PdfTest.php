@@ -30,15 +30,15 @@ class PdfTest extends TestCase
         Passport::actingAs($this->user);
 
         $this->json('POST', '/api/deal', [
-            'user_id'      => $this->user->id,
-            'customer'     => [
+            'user_id'          => $this->user->id,
+            'customer'         => [
                 'first_name' => 'some_name',
                 'last_name'  => 'some_name',
                 'email'      => 'some_name@test.com',
                 'phone'      => '2344567890'
             ],
-            'sales_status' => 'Greeting',
-            'trades'       => [
+            'sales_status'     => 'Greeting',
+            'trades'           => [
                 [
                     'vin'            => 'YT123456',
                     'year'           => 2018,
@@ -56,7 +56,7 @@ class PdfTest extends TestCase
                     'book_value'     => 3500
                 ]
             ],
-            'units'        => [
+            'units'            => [
                 [
                     'stock_number'         => 'Y123456',
                     'year'                 => 2018,
@@ -84,13 +84,14 @@ class PdfTest extends TestCase
                 ]
             ],
             'payment_schedule' => [
-                'rate'            => 13.49,
-                'payment_options' => [
+                'rate'                             => 13.49,
+                'show_accessories_payments_on_pdf' => 1,
+                'payment_options'                  => [
                     'down_payment_options' => [1000, 2000, 3000],
                     'months'               => [18, 24, 48],
                 ]
             ],
-            'accessories' => [
+            'accessories'      => [
                 [
                     'part_number' => 'ACC12345',
                     'item_name'   => 'Item',
@@ -114,8 +115,8 @@ class PdfTest extends TestCase
             ->assertStatus(201);
 
         // check local if PDF created correctly
-        // $pdf = base64_decode($response->getContent());
+        $pdf = base64_decode($response->getContent());
 
-        // file_put_contents(storage_path('test.pdf'), $pdf);
+        file_put_contents(storage_path('test.pdf'), $pdf);
     }
 }
