@@ -248,6 +248,7 @@ class DealsTest extends TestCase
                 ]
             ]
         ]))
+            ->dump()
             ->assertStatus(201)
             ->assertJsonFragment(['Y123456'])
             ->assertJsonFragment(['Y987654']);
