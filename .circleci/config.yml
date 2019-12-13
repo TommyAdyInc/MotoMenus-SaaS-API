@@ -96,6 +96,9 @@ jobs:
           keys:
             - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
       - run:
+          name: Install mysql-client
+          command: apk add --no-cache mysql-client
+      - run:
           name: Set environment variables needed in subsequent steps
           command: echo "export APP_KEY=$(php artisan key:generate --show)" >> $BASH_ENV
       - restore_cache:
