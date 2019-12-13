@@ -111,7 +111,7 @@ class PdfTest extends TestCase
 
         $response = $this->json('GET', '/api/pdf/1', ['type' => 'deal']);
         $response
-            ->dump()
+            // ->dump()
             ->assertStatus(201);
 
         // check local if PDF created correctly
