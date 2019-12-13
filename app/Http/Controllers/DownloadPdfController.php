@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class DownloadPdfController extends Controller
 {
-    public function create(Deal $deal)
+    public function show(Deal $deal)
     {
         request()->validate([
             'type' => ['required', 'in:deal,finance'],

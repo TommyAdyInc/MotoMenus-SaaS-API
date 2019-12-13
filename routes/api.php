@@ -80,10 +80,10 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');
-    Route::get('pdf/{deal}', 'DownloadPdfController@create')->name('download.pdf');
+    Route::get('pdf/{deal}', 'DownloadPdfController@show')->name('download.pdf');
 });
 
-//Routes for Tenant Admin users
+// Routes for Tenant Admin users
 Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('', 'UserController@index')->name('get.users');
@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
     });
 });
 
-//Routes for Super Admin users
+// Routes for Super Admin users
 Route::group(['middleware' => ['auth:api', 'auth.super.admin']], function () {
     Route::group(['prefix' => 'global-settings'], function () {
         Route::get('', 'GlobalSettingController@index')->name('get.global.settings');
