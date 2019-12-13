@@ -11,8 +11,6 @@ use GuzzleHttp\Client;
 
 class OAuthTokenTest extends TestCase
 {
-    const URI = 'http://local-phpunit.dev.api.motomenus.local:40010';
-
     public function setUp(): void
     {
         $this->markTestSkipped('Want to run this local only');
@@ -31,7 +29,7 @@ class OAuthTokenTest extends TestCase
     {
         $http = new Client;
 
-        $response = $http->post(self::URI . '/oauth/token', [
+        $response = $http->post(config('app.url') . '/oauth/token', [
             'form_params' => [
                 'grant_type'    => 'password',
                 'client_id'     => '2',

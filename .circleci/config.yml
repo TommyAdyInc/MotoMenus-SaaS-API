@@ -79,12 +79,13 @@ jobs:
       - image: ${AWS_ECR_ACCOUNT_URL}/motomenus-saas-api-php-fpm:latest
         environment:
           APP_ENV: "testing"
+          DB_DATABASE_SYSTEM: "000-system-phpunit"
       - image: circleci/mysql:5.7.22
         command: mysqld --character-set-server="utf8mb4" --collation-server="utf8mb4_unicode_ci" --sql-mode="NO_ENGINE_SUBSTITUTION"
         environment:
           MYSQL_ROOT_HOST: "%"
           MYSQL_ROOT_PASSWORD: "rootpass"
-          MYSQL_DATABASE: "000-system"
+          MYSQL_DATABASE: "000-system-phpunit"
     environment:
       - BASH_ENV: /etc/profile
     shell: /bin/sh -leo pipefail
@@ -102,7 +103,10 @@ jobs:
             - oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
       - run:
           name: Run "system" migrations
-          command: php artisan migrate --database="connection_system"
+          command: php artisan migrate
+      - run:
+          name: Run "system" seeders
+          command: php artisan db:seed
       - run:
           name: Run unit tests
           command: vendor/bin/phpunit
