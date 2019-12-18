@@ -31,7 +31,7 @@ jobs:
             - "vendor"
       - restore_cache:
           keys:
-            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
       - run:
           name: Install Composer dependencies
           environment:
@@ -41,7 +41,7 @@ jobs:
           name: Update the Composer autoloader (To handle new classes in a classmap package)
           command: composer dump-autoload --no-scripts
       - save_cache:
-          key: composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          key: composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
           paths:
             - "vendor"
 
@@ -56,7 +56,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
       - run:
           name: Set environment variables needed in subsequent steps
           command: |
@@ -94,7 +94,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-with-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
       - run:
           name: Install mysql-client
           command: apk add --no-cache mysql-client
