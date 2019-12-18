@@ -16,7 +16,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
       - run:
           name: Install Composer dependencies
           environment:
@@ -26,7 +26,7 @@ jobs:
           name: Update the Composer autoloader (To handle new classes in a classmap package)
           command: composer dump-autoload --no-scripts
       - save_cache:
-          key: composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+          key: composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
           paths:
             - "vendor"
       - restore_cache:
@@ -121,7 +121,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}
+            - composer-install-without-dev-deps-v1-{{ .Branch }}-{{ checksum "composer.lock" }}-{{ checksum "composer.json" }}-{{ checksum "database/seeds/DatabaseSeeder.php" }}-{{ checksum "database/seeds/TenantDatabaseSeeder.php" }}
       - restore_cache:
           keys:
             - oauth-encryption-keys-v1-{{ .Branch }}-{{ .Revision }}
