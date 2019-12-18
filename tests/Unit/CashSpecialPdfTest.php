@@ -37,8 +37,8 @@ class CashSpecialPdfTest extends TestCase
             ->assertStatus(201);
 
         // check local if PDF created correctly
-        $pdf = base64_decode($response->getContent());
+        // $pdf = base64_decode($response->getContent());
 
-        file_put_contents(storage_path('test.pdf'), $pdf);
+        // file_put_contents(storage_path('test.pdf'), $pdf);
     }
 }
