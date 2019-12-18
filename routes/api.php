@@ -80,6 +80,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');
+    Route::get('pdf/cash-special', 'DownloadCashSpecialsPdfController@show')->name('cash.specials.pdf');
     Route::get('pdf/{deal}', 'DownloadPdfController@show')->name('download.pdf');
 });
 
@@ -88,6 +89,11 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('', 'UserController@index')->name('get.users');
         Route::post('', 'UserController@store')->name('create.new.user');
+    });
+
+    Route::group(['prefix' => 'cash-specials'], function() {
+        Route::get('', 'CashSpecialController@index')->name('get.cash.specials');
+        Route::put('', 'CashSpecialController@update')->name('update.cash.specials');
     });
 });
 

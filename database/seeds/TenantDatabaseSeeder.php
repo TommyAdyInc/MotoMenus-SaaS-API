@@ -12,6 +12,7 @@ class TenantDatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(CashSpecialSeeder::class);
         $this->call(StoreSettingsSeeder::class);
         $this->call(UserSeeder::class);
     }
