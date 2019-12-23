@@ -29,7 +29,7 @@ class OAuthTokenTest extends TestCase
     {
         $http = new Client;
 
-        $response = $http->post(config('app.url') . '/oauth/token', [
+        $response = $http->post(config('app.url') . ':40010/api/oauth/token', [
             'form_params' => [
                 'grant_type'    => 'password',
                 'client_id'     => '2',
@@ -37,9 +37,24 @@ class OAuthTokenTest extends TestCase
                 'username'      => 'flastname@motomenus.test',
                 'password'      => 'temp1212',
                 'scope'         => '',
+                'provider'      => 'users',
             ],
         ]);
 
-        $this->assertArrayHasKey('access_token', json_decode((string)$response->getBody(), true));
+        $this->assertArrayHasKey('access_token', json_decode((string)$response->getBody(), true)['token']);
+
+        $response = $http->post(config('app.url') . ':40010/api/oauth/token', [
+            'form_params' => [
+                'grant_type'    => 'password',
+                'client_id'     => '2',
+                'client_secret' => 'vWoiYeTZONl82Ln4XHLpA1qEPFvPy5AbcAbYcUv2',
+                'username'      => 'tommyady@whaterverdomain.com',
+                'password'      => 'temp1212',
+                'scope'         => '',
+                'provider'      => 'superadmins',
+            ],
+        ]);
+
+        $this->assertArrayHasKey('access_token', json_decode((string)$response->getBody(), true)['token']);
     }
 }

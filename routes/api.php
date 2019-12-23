@@ -98,10 +98,10 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
 });
 
 // Routes for Super Admin users
-Route::group(['middleware' => ['auth:api', 'auth.super.admin']], function () {
+Route::group(['middleware' => ['auth:api_super_admin', 'auth.super.admin']], function () {
     Route::group(['prefix' => 'global-settings'], function () {
         Route::get('', 'GlobalSettingController@index')->name('get.global.settings');
-        Route::put('', 'GlobalSettingController@store')->name('update.global.settings');
+        Route::put('', 'GlobalSettingController@update')->name('update.global.settings');
     });
 });
 
@@ -111,3 +111,8 @@ Route::get('health-check', function () {
         'success' => true
     ], 200, []);
 });
+
+// use our custom oauth token controller
+Route::post('oauth/token', 'Auth\SuperAdminTokenAuthController@issueToken')
+    ->middleware(['throttle', 'provider'])
+    ->name('issue.token');

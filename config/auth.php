@@ -46,6 +46,10 @@ return [
             'provider' => 'users',
         ],
 
+        'api_super_admin' => [
+            'driver'   => 'passport',
+            'provider' => 'superadmins',
+        ],
     ],
 
     /*
@@ -71,10 +75,10 @@ return [
             'model' => App\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'superadmins' => [
+            'driver' => 'eloquent',
+            'model' => App\SuperAdmin::class,
+        ],
     ],
 
     /*
