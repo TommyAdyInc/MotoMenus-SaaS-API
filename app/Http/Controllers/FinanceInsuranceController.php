@@ -15,18 +15,36 @@ class FinanceInsuranceController extends Controller
     public function store(Deal $deal)
     {
         request()->validate([
-            'cash_down_payment'                     => ['nullable', 'numeric', 'min:0'],
-            'preferred_standard_rate'               => ['nullable', 'numeric', 'min:0'],
-            'preferred_standard_term'               => ['nullable', 'numeric', 'min:0'],
-            'promotional_rate'                      => ['nullable', 'numeric', 'min:0'],
-            'promotional_term'                      => ['nullable', 'numeric', 'min:0'],
-            'full_protection'                       => ['nullable', 'numeric', 'min:0'],
-            'limited_protection'                    => ['nullable', 'numeric', 'min:0'],
-            'tire_wheel'                            => ['nullable', 'numeric', 'min:0'],
-            'gap_coverage'                          => ['nullable', 'numeric', 'min:0'],
-            'theft'                                 => ['nullable', 'numeric', 'min:0'],
-            'priority_maintenance'                  => ['nullable', 'numeric', 'min:0'],
-            'appearance_protection'                 => ['nullable', 'numeric', 'min:0'],
+            'cash_down_payment'       => ['nullable', 'numeric', 'min:0'],
+            'preferred_standard_rate' => ['nullable', 'numeric', 'min:0'],
+            'preferred_standard_term' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value, config('payment_months'))) {
+                        $fail($value . ' is not valid payment term.');
+                    }
+                }
+            ],
+            'promotional_rate'        => ['nullable', 'numeric', 'min:0'],
+            'promotional_term'        => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value, config('payment_months'))) {
+                        $fail($value . ' is not valid payment term.');
+                    }
+                }
+            ],
+            'full_protection'         => ['nullable', 'numeric', 'min:0'],
+            'limited_protection'      => ['nullable', 'numeric', 'min:0'],
+            'tire_wheel'              => ['nullable', 'numeric', 'min:0'],
+            'gap_coverage'            => ['nullable', 'numeric', 'min:0'],
+            'theft'                   => ['nullable', 'numeric', 'min:0'],
+            'priority_maintenance'    => ['nullable', 'numeric', 'min:0'],
+            'appearance_protection'   => ['nullable', 'numeric', 'min:0'],
         ]);
 
         try {
@@ -34,7 +52,7 @@ class FinanceInsuranceController extends Controller
                 throw new \Exception('Can only create F&I for own deal');
             }
 
-            if($deal->has('finance_insurance')) {
+            if ($deal->has('finance_insurance')) {
                 throw new \Exception('F&I already exists on the deal. To make changes please use update api.');
             }
 
@@ -53,18 +71,36 @@ class FinanceInsuranceController extends Controller
     public function update(Deal $deal, FinanceInsurance $finance_insurance)
     {
         request()->validate([
-            'cash_down_payment'                     => ['nullable', 'numeric', 'min:0'],
-            'preferred_standard_rate'               => ['nullable', 'numeric', 'min:0'],
-            'preferred_standard_term'               => ['nullable', 'numeric', 'min:0'],
-            'promotional_rate'                      => ['nullable', 'numeric', 'min:0'],
-            'promotional_term'                      => ['nullable', 'numeric', 'min:0'],
-            'full_protection'                       => ['nullable', 'numeric', 'min:0'],
-            'limited_protection'                    => ['nullable', 'numeric', 'min:0'],
-            'tire_wheel'                            => ['nullable', 'numeric', 'min:0'],
-            'gap_coverage'                          => ['nullable', 'numeric', 'min:0'],
-            'theft'                                 => ['nullable', 'numeric', 'min:0'],
-            'priority_maintenance'                  => ['nullable', 'numeric', 'min:0'],
-            'appearance_protection'                 => ['nullable', 'numeric', 'min:0'],
+            'cash_down_payment'       => ['nullable', 'numeric', 'min:0'],
+            'preferred_standard_rate' => ['nullable', 'numeric', 'min:0'],
+            'preferred_standard_term' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value, config('payment_months'))) {
+                        $fail($value . ' is not valid payment term.');
+                    }
+                }
+            ],
+            'promotional_rate'        => ['nullable', 'numeric', 'min:0'],
+            'promotional_term'        => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    if (!in_array($value, config('payment_months'))) {
+                        $fail($value . ' is not valid payment term.');
+                    }
+                }
+            ],
+            'full_protection'         => ['nullable', 'numeric', 'min:0'],
+            'limited_protection'      => ['nullable', 'numeric', 'min:0'],
+            'tire_wheel'              => ['nullable', 'numeric', 'min:0'],
+            'gap_coverage'            => ['nullable', 'numeric', 'min:0'],
+            'theft'                   => ['nullable', 'numeric', 'min:0'],
+            'priority_maintenance'    => ['nullable', 'numeric', 'min:0'],
+            'appearance_protection'   => ['nullable', 'numeric', 'min:0'],
         ]);
 
         try {

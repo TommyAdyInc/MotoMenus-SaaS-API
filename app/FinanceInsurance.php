@@ -23,4 +23,14 @@ class FinanceInsurance extends Model
         'priority_maintenance',
         'appearance_protection',
     ];
+
+    public function getPreferredAttribute()
+    {
+        return $this->full_protection + $this->tire_wheel + $this->gap_coverage + $this->theft + $this->priority_maintenance + $this->appearnce_protection;
+    }
+
+    public function getStandardAttribute()
+    {
+        return $this->limited_protection + $this->tire_wheel;
+    }
 }

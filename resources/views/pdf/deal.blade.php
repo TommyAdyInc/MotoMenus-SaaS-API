@@ -195,7 +195,7 @@
                     <td>Year:</td>
                     <td>{{$trade->year}}</td>
                     <td>Model Number:</td>
-                    <td>{{$trade->model}}</td>
+                    <td>{{$trade->model_number}}</td>
                     <td>Odometer:</td>
                     <td>{{$trade->odometer}}</td>
                 </tr>
