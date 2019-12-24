@@ -65,7 +65,7 @@ abstract class TestCase extends BaseTestCase
         extract(config('database.connections.connection_system'));
 
         dump('Dropping system database...');
-        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS `$database`;\"  --verbose");
+        $this->execProcess(['mysql', "--host=$host", "--password=$password", "--port=$port", "--protocol=tcp", "--user=$username", "--execute=DROP DATABASE IF EXISTS `$database`;",  '--verbose']);
 
         dump('Re-creating system database...');
         $this->execProcess("mysql --default-character-set=utf8 --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"CREATE DATABASE `$database`;\"  --verbose");
