@@ -12,7 +12,6 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use PDO;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -66,10 +65,10 @@ abstract class TestCase extends BaseTestCase
         extract(config('database.connections.connection_system'));
 
         dump('Dropping system database...');
-        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS \140$database\140;\" --verbose");
+        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS `$database`;\"  --verbose");
 
         dump('Re-creating system database...');
-        $this->execProcess("mysql --default-character-set=utf8 --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"CREATE DATABASE \140$database\140;\"  --verbose");
+        $this->execProcess("mysql --default-character-set=utf8 --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"CREATE DATABASE `$database`;\"  --verbose");
 
         dump('Migrating system database...');
         Artisan::call('migrate --database="connection_system"');
@@ -83,7 +82,7 @@ abstract class TestCase extends BaseTestCase
         extract(config('database.connections.connection_system'));
 
         dump('Dropping tenant database and user...');
-        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS \140" . self::WEBSITE_UUID . "\140; DROP USER IF EXISTS \140" .  self::WEBSITE_UUID . "\140\"  --verbose");
+        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS `" . self::WEBSITE_UUID . "`; DROP USER IF EXISTS `" .  self::WEBSITE_UUID . "`\"  --verbose");
 
         dump('Re-creating tenant database...');
         $website_repository = app(WebsiteRepository::class);
