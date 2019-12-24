@@ -68,7 +68,7 @@ abstract class TestCase extends BaseTestCase
         $this->execProcess(['mysql', "--host=$host", "--password=$password", "--port=$port", "--protocol=tcp", "--user=$username", "--execute=DROP DATABASE IF EXISTS `$database`;",  '--verbose']);
 
         dump('Re-creating system database...');
-        $this->execProcess("mysql --default-character-set=utf8 --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"CREATE DATABASE `$database`;\"  --verbose");
+        $this->execProcess(['mysql', '--default-character-set=utf8', "--host=$host", "--password=$password", "--port=$port", '--protocol=tcp', "--user=$username", "--execute=CREATE DATABASE `$database`;",  '--verbose']);
 
         dump('Migrating system database...');
         Artisan::call('migrate --database="connection_system"');
@@ -82,7 +82,7 @@ abstract class TestCase extends BaseTestCase
         extract(config('database.connections.connection_system'));
 
         dump('Dropping tenant database and user...');
-        $this->execProcess("mysql --host=$host --password=$password --port=$port --protocol=tcp --user=$username --execute=\"DROP DATABASE IF EXISTS `" . self::WEBSITE_UUID . "`; DROP USER IF EXISTS `" .  self::WEBSITE_UUID . "`\"  --verbose");
+        $this->execProcess(['mysql', "--host=$host", "--password=$password", "--port=$port", '--protocol=tcp', "--user=$username", "--execute=DROP DATABASE IF EXISTS `" . self::WEBSITE_UUID . "`; DROP USER IF EXISTS `" .  self::WEBSITE_UUID . "`",  '--verbose']);
 
         dump('Re-creating tenant database...');
         $website_repository = app(WebsiteRepository::class);
