@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // Routes for all Tenant users
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth.or.super.admin']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     })->name('get.authenticated.user');
@@ -85,7 +85,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 });
 
 // Routes for Tenant Admin users
-Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
+Route::group(['middleware' => ['auth.or.super.admin', 'auth.admin']], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('', 'UserController@index')->name('get.users');
         Route::post('', 'UserController@store')->name('create.new.user');

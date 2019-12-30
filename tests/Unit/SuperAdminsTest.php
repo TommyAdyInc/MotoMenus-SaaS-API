@@ -53,4 +53,26 @@ class SuperAdminsTest extends TestCase
 
         $this->json('PUT', '/api/global-settings', ['document_fee' => 123])->assertStatus(201);
     }
+
+    /** @test * */
+    function super_admins_can_access_tenant_routes()
+    {
+        PassportMultiAuth::actingAs($this->super_admin);
+
+        $this->json('GET', '/api/customers')
+            // ->dump()
+            ->assertStatus(201);
+    }
+
+    /** @test * */
+    function super_admins_can_access_tenant_admin_routes()
+    {
+        PassportMultiAuth::actingAs($this->super_admin);
+
+        $this->json('GET', '/api/users')
+            // ->dump()
+            ->assertStatus(201);
+    }
+
+    // TODO: if SuperAdmin should be able to create users, deals, customers then need to add test for those
 }

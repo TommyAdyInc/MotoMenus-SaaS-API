@@ -10,13 +10,14 @@ namespace App\Http\Middleware;
 
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
-class IsAdmin
+class AuthOrSuperAdmin
 {
     public function handle($request, Closure $next)
     {
         try {
-            if ($request->user()->role === 'admin' || auth()->user()->isSuperAdmin()) {
+            if (Auth::guard('api')->check() || Auth::guard('api_super_admin')->check()) {
                 return $next($request);
             }
 
