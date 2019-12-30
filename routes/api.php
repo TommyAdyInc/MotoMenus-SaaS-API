@@ -95,6 +95,9 @@ Route::group(['middleware' => ['auth:api', 'auth.admin']], function () {
         Route::get('', 'CashSpecialController@index')->name('get.cash.specials');
         Route::put('', 'CashSpecialController@update')->name('update.cash.specials');
     });
+
+    Route::post('logo', 'TenantLogoController@store')->name('store.logo');
+    Route::get('logo', 'TenantLogoController@show')->name('get.logo');
 });
 
 // Routes for Super Admin users
