@@ -45,7 +45,7 @@ class Customer extends Model
 
     public function scopeCanSeeAll($query)
     {
-        if (!isAdmin()) {
+        if (!isAdmin() && !auth()->user()->isSuperAdmin()) {
             $query->whereUserId(auth()->id());
         }
 

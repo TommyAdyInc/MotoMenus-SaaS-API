@@ -69,7 +69,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         try {
-            if(!isAdmin()) {
+            if(!isAdmin() && !auth()->user()->isSuperAdmin()) {
                 if(auth()->id() !== $customer->user_id) {
                     throw new \Exception('Cannot view other user customer.');
                 }

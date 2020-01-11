@@ -194,9 +194,9 @@ class Deal extends Model
 
     public function scopeCanGetAll($query)
     {
-        if (isAdmin() && request()->has('user_id') && auth()->id() != request()->get('user_id')) {
+        if ((isAdmin() || auth()->user()->isSuperAdmin()) && request()->has('user_id') && auth()->id() != request()->get('user_id')) {
             $query->whereUserId(request()->get('user_id'));
-        } elseif (!isAdmin()) {
+        } elseif (!isAdmin() && !auth()->user()->isSuperAdmin()) {
             $query->whereUserId(auth()->id());
         }
 
@@ -266,7 +266,7 @@ class Deal extends Model
 
     public function getTotalCashBalanceAttribute()
     {
-        return $this->units->reduce(function($total, $unit) {
+        return $this->units->reduce(function ($total, $unit) {
             $total += round($unit->purchase_information->cash_balance, 2);
 
             return $total;
@@ -275,7 +275,8 @@ class Deal extends Model
 
     public function totalFinanceOptions(PaymentSchedule $payment_schedule)
     {
-        $payments = new PaymentsCalculation($payment_schedule->payment_options['down_payment_options'], $payment_schedule->rate, $this->total_cash_balance);
+        $payments = new PaymentsCalculation($payment_schedule->payment_options['down_payment_options'],
+            $payment_schedule->rate, $this->total_cash_balance);
 
         return collect($payments->getPayments())->only($payment_schedule->payment_options['months']);
     }

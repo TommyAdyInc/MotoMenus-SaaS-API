@@ -44,7 +44,7 @@ class UserController extends Controller
         ]);
 
         try {
-            if(!isAdmin()) {
+            if(!isAdmin() && !auth()->user()->isSuperAdmin()) {
                 if(auth()->id() !== $user->id) {
                     throw new \Exception('Can only modify own user data.');
                 }
@@ -65,7 +65,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         try {
-            if(!isAdmin()) {
+            if(!isAdmin() && !auth()->user()->isSuperAdmin()) {
                 if(auth()->id() !== $user->id) {
                     throw new \Exception('Can only view own user data.');
                 }

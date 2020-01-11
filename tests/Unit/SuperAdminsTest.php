@@ -60,7 +60,6 @@ class SuperAdminsTest extends TestCase
         PassportMultiAuth::actingAs($this->super_admin);
 
         $this->json('GET', '/api/customers')
-            // ->dump()
             ->assertStatus(201);
     }
 
@@ -70,9 +69,45 @@ class SuperAdminsTest extends TestCase
         PassportMultiAuth::actingAs($this->super_admin);
 
         $this->json('GET', '/api/users')
-            // ->dump()
             ->assertStatus(201);
     }
 
-    // TODO: if SuperAdmin should be able to create users, deals, customers then need to add test for those
+    /** @test * */
+    function super_admins_can_create_tenant_users()
+    {
+        PassportMultiAuth::actingAs($this->super_admin);
+
+        $this->json('POST','/api/users', [
+            'name'     => 'Test Name',
+            'email'    => 'test@test.com',
+            'password' => 'test1234',
+            'role'     => 'user',
+        ])->assertStatus(201);
+    }
+
+    /** @test * */
+    function super_admins_can_update_tenant_users()
+    {
+        PassportMultiAuth::actingAs($this->super_admin);
+
+        $response = $this->post('/api/users', [
+            'name'     => 'Test Name',
+            'email'    => 'test@test.com',
+            'password' => 'test1234',
+            'role'     => 'user',
+        ]);
+
+        $response = json_decode((string)$response->getContent(), true);
+        $this->assertArrayHasKey('id', $response);
+
+        $response = $this->put('/api/users/' . $response['id'], [
+            'name' => 'My Updated Name',
+            'role' => 'admin'
+        ]);
+
+        $response->assertStatus(201);
+        $response = json_decode((string)$response->getContent(), true);
+        $this->assertEquals('My Updated Name', $response['name']);
+        $this->assertEquals('admin', $response['role']);
+    }
 }

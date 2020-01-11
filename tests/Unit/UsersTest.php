@@ -44,7 +44,7 @@ class UsersTest extends TestCase
     }
 
     /** @test * */
-    function updating_user_returns_updated_customer_with_role()
+    function updating_user_returns_updated_user_with_role()
     {
         Passport::actingAs($this->user);
 

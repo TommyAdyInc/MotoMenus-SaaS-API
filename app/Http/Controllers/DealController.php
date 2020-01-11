@@ -127,7 +127,7 @@ class DealController extends Controller
     public function show(Deal $deal)
     {
         try {
-            if (!isAdmin() && $deal->user_id != auth()->id()) {
+            if (!isAdmin() && !auth()->user()->isSuperAdmin() && $deal->user_id != auth()->id()) {
                 throw new \Exception('Can only view own deals.');
             }
 

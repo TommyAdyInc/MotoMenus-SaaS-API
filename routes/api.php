@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // Routes for all Tenant users
-Route::group(['middleware' => ['auth.or.super.admin']], function () {
+Route::group(['middleware' => ['api:auth']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     })->name('get.authenticated.user');
@@ -26,28 +26,21 @@ Route::group(['middleware' => ['auth.or.super.admin']], function () {
     });
 
     Route::group(['prefix' => 'customers'], function () {
-        Route::get('/export', 'ExportCustomerListController@index')->name('export.customer.list');
-
-        Route::get('', 'CustomerController@index')->name('get.customers');
         Route::post('', 'CustomerController@store')->name('create.new.customer');
         Route::put('/{customer}', 'CustomerController@update')->name('update.customer');
-        Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
     });
 
     Route::group(['prefix' => 'deal'], function () {
-        Route::get('', 'DealController@index')->name('all.deals');
         Route::post('', 'DealController@store')->name('store.deal');
         Route::put('/{deal}', 'DealController@update')->name('update.deal');
-        Route::get('/{deal}', 'DealController@show')->name('show.deal');
         Route::delete('/{deal}', 'DealController@delete')->name('delete.deal');
-
-        Route::get('options', 'DealOptionsController@index')->name('deal.options');
     });
 
     Route::group(['prefix' => 'finance-insurance'], function () {
         Route::post('/{deal}', 'FinanceInsuranceController@store')->name('create.finance.insurance');
         Route::put('/{deal}/{payment_schedule}', 'FinanceInsuranceController@update')->name('update.finance.insurance');
-        Route::delete('/{deal}/{payment_schedule}', 'FinanceInsuranceController@store')->name('delete.finance.insurance');
+        Route::delete('/{deal}/{payment_schedule}',
+            'FinanceInsuranceController@store')->name('delete.finance.insurance');
     });
 
     Route::group(['prefix' => 'payment-schedule'], function () {
@@ -58,8 +51,10 @@ Route::group(['middleware' => ['auth.or.super.admin']], function () {
 
     Route::group(['prefix' => 'purchase-information'], function () {
         Route::post('/{deal}/{unit}', 'PurchaseInformationController@store')->name('create.purchase.information');
-        Route::put('/{deal}/{unit}/{purchase_information}', 'PurchaseInformationController@update')->name('update.purchase.information');
-        Route::delete('/{deal}/{unit}/{purchase_information}', 'PurchaseInformationController@store')->name('delete.purchase.information');
+        Route::put('/{deal}/{unit}/{purchase_information}',
+            'PurchaseInformationController@update')->name('update.purchase.information');
+        Route::delete('/{deal}/{unit}/{purchase_information}',
+            'PurchaseInformationController@store')->name('delete.purchase.information');
     });
 
     Route::group(['prefix' => 'trades'], function () {
@@ -72,6 +67,22 @@ Route::group(['middleware' => ['auth.or.super.admin']], function () {
         Route::post('/{deal}', 'UnitsController@store')->name('create.unit');
         Route::put('/{deal}/{unit}', 'UnitsController@update')->name('update.unit');
         Route::delete('/{deal}/{unit}', 'UnitsController@store')->name('delete.unit');
+    });
+});
+
+// Tenant user and Super Admin route access
+Route::group(['middleware' => ['auth.or.super.admin']], function () {
+    Route::group(['prefix' => 'customers'], function () {
+        Route::get('/export', 'ExportCustomerListController@index')->name('export.customer.list');
+        Route::get('', 'CustomerController@index')->name('get.customers');
+        Route::get('/{customer}', 'CustomerController@show')->name('retrieve.specific.customer');
+    });
+
+    Route::group(['prefix' => 'deal'], function () {
+        Route::get('', 'DealController@index')->name('all.deals');
+        Route::get('/{deal}', 'DealController@show')->name('show.deal');
+
+        Route::get('options', 'DealOptionsController@index')->name('deal.options');
     });
 
     Route::group(['prefix' => 'users'], function () {
@@ -91,7 +102,7 @@ Route::group(['middleware' => ['auth.or.super.admin', 'auth.admin']], function (
         Route::post('', 'UserController@store')->name('create.new.user');
     });
 
-    Route::group(['prefix' => 'cash-specials'], function() {
+    Route::group(['prefix' => 'cash-specials'], function () {
         Route::get('', 'CashSpecialController@index')->name('get.cash.specials');
         Route::put('', 'CashSpecialController@update')->name('update.cash.specials');
     });
