@@ -57,9 +57,23 @@ class TenantsController extends Controller
     public function delete(Website $website)
     {
         try {
-            $website->hostnames()->delete();
+            // $website->hostnames()->delete();
 
             $website->delete();
+
+            return response()->json(true, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function restore(Website $website)
+    {
+        try {
+            // $website->hostnames()->delete();
+
+            $website->deleted_at = null;
+            $website->save();
 
             return response()->json(true, 201);
         } catch (\Exception $e) {

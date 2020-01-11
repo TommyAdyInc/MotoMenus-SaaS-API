@@ -61,7 +61,15 @@ class TenantsTest extends TestCase
     {
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('DELETE', '/api/tenants/1')
+        $this->json('POST', '/api/tenants', [
+            'fqdn'       => 'motomenus.demo2.app',
+            'store_name' => 'Demo Store'
+        ])
+            // ->dump()
+            ->assertStatus(201);
+
+        $this->json('DELETE', '/api/tenants/2')
+            // ->dump()
             ->assertStatus(201);
     }
 }

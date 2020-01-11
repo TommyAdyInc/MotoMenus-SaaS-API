@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // Routes for all Tenant users
-Route::group(['middleware' => ['api:auth']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     })->name('get.authenticated.user');
