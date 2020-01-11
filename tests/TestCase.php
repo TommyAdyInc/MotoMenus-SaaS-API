@@ -5,7 +5,7 @@ namespace Tests;
 use Hyn\Tenancy\Database\Connection;
 use Hyn\Tenancy\Environment;
 use Hyn\Tenancy\Models\Hostname;
-use Hyn\Tenancy\Models\Website;
+use App\Website;
 use Hyn\Tenancy\Repositories\HostnameRepository;
 use Hyn\Tenancy\Repositories\WebsiteRepository;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;

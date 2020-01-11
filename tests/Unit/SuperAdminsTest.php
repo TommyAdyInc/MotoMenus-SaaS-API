@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use App\SuperAdmin;
 use App\User;
-use Laravel\Passport\Passport;
 use SuperAdminSeeder;
 use Tests\PassportMultiAuth;
 use Tests\TestCase;

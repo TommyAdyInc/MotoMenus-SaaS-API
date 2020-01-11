@@ -109,6 +109,8 @@ Route::group(['middleware' => ['auth.or.super.admin', 'auth.admin']], function (
 
     Route::post('logo', 'TenantLogoController@store')->name('store.logo');
     Route::get('logo', 'TenantLogoController@show')->name('get.logo');
+
+    Route::put('store-name', 'StoreNameController@update')->name('set.store.name');
 });
 
 // Routes for Super Admin users
@@ -116,6 +118,14 @@ Route::group(['middleware' => ['auth:api_super_admin', 'auth.super.admin']], fun
     Route::group(['prefix' => 'global-settings'], function () {
         Route::get('', 'GlobalSettingController@index')->name('get.global.settings');
         Route::put('', 'GlobalSettingController@update')->name('update.global.settings');
+    });
+
+    Route::group(['prefix' => 'tenants'], function () {
+        Route::get('', 'TenantsController@index')->name('get.tenants');
+        Route::post('', 'TenantsController@store')->name('create.tenant');
+        Route::put('', 'StoreNameController@update')->name('update.tenant'); // Only update Store Name
+        Route::get('{website}', 'TenantsController@show')->name('show.tenant');
+        Route::delete('{website}', 'TenantsController@delete')->name('delete.tenant');
     });
 });
 
