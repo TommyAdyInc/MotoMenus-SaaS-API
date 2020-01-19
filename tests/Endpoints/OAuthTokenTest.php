@@ -3,10 +3,7 @@
 namespace Tests\Endpoints;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use UserSeeder;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 
 class OAuthTokenTest extends TestCase

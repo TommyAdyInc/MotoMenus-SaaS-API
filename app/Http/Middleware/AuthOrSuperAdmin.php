@@ -18,6 +18,11 @@ class AuthOrSuperAdmin
     {
         try {
             if (Auth::guard('api')->check() || Auth::guard('api_super_admin')->check()) {
+                // if super admin set correct guard
+                if(Auth::guard('api_super_admin')->check()) {
+                    config()->set(['auth.guards' => 'api_super_admin']);
+                }
+
                 return $next($request);
             }
 

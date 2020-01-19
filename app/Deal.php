@@ -26,7 +26,16 @@ class Deal extends Model
         'payment_schedule',
         'units.purchase_information',
         'trades',
+        'user',
+        'customer'
     ];
+
+    protected $appends = ['deal_date'];
+
+    public function getDealDateAttribute()
+    {
+        return $this->created_at->format('m/d/Y');
+    }
 
     public function accessories(): hasMany
     {

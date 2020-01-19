@@ -12,7 +12,7 @@ class ProviderDetector
     {
         $validator = validator()->make($request->all(), [
             'username' => 'required',
-            'provider' => 'required',
+            'provider' => 'required|in:superadmins,users',
         ]);
 
         if ($validator->fails()) {

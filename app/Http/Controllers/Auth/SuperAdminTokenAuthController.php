@@ -38,14 +38,15 @@ class SuperAdminTokenAuthController extends AccessTokenController
     /**
      * Create a new controller instance.
      *
-     * @param  \League\OAuth2\Server\AuthorizationServer  $server
-     * @param  \Laravel\Passport\TokenRepository  $tokens
-     * @param  \Lcobucci\JWT\Parser  $jwt
+     * @param \League\OAuth2\Server\AuthorizationServer $server
+     * @param \Laravel\Passport\TokenRepository         $tokens
+     * @param \Lcobucci\JWT\Parser                      $jwt
      */
-    public function __construct(AuthorizationServer $server,
+    public function __construct(
+        AuthorizationServer $server,
         TokenRepository $tokens,
-        JwtParser $jwt)
-    {
+        JwtParser $jwt
+    ) {
         parent::__construct($server, $tokens, $jwt);
     }
 
@@ -53,6 +54,7 @@ class SuperAdminTokenAuthController extends AccessTokenController
      * Override the default Laravel Passport token generation
      *
      * @param ServerRequestInterface $request
+     *
      * @return array
      */
     public function issueToken(ServerRequestInterface $request)
@@ -62,7 +64,7 @@ class SuperAdminTokenAuthController extends AccessTokenController
 
         if (array_key_exists('error', $token)) {
             return response()->json([
-                'error' => $token['error'],
+                'error'       => $token['error'],
                 'status_code' => 401
             ], 401);
         }
@@ -77,18 +79,19 @@ class SuperAdminTokenAuthController extends AccessTokenController
                     $user = SuperAdmin::where('email', $email)->firstOrFail();
                 } catch (\Exception $e) {
                     return response()->json([
-                        'error' => $e->getMessage(),
+                        'error'       => $e->getMessage(),
                         'status_code' => 401
                     ], 401);
                 }
 
                 break;
+            case 'users':
             default :
                 try {
                     $user = User::where('email', $email)->firstOrFail();
                 } catch (\Exception $e) {
                     return response()->json([
-                        'error' => $e->getMessage(),
+                        'error'       => $e->getMessage(),
                         'status_code' => 401
                     ], 401);
                 }
