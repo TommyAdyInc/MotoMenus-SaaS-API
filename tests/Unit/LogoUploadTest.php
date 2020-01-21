@@ -26,11 +26,11 @@ class LogoUploadTest extends TestCase
      *
      * @return void
      */
-    public function creates_a_deal_pdf_successfully()
+    public function creates_a_store_logo_successfully()
     {
         Passport::actingAs($this->user);
 
-        $this->json('POST', '/api/logo', [
+        $this->json('POST', '/api/settings/logo', [
             'file' => UploadedFile::fake()->image('mylogo.jpg', 1200, 800)
         ])
             ->assertStatus(201);

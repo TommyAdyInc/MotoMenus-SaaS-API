@@ -29,7 +29,7 @@ class StoreNameTest extends TestCase
     {
         Passport::actingAs($this->user);
 
-        $this->json('PUT', '/api/store-name', [
+        $this->json('PUT', '/api/settings/store-name', [
             'name' => 'Another Store Name'
         ])
             ->assertStatus(201);
