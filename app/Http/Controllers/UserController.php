@@ -10,7 +10,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            return response()->json(User::all(), 201);
+            return response()->json(User::orderBy('name')->paginate(20), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

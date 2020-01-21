@@ -107,10 +107,15 @@ Route::group(['middleware' => ['auth.or.super.admin', 'auth.admin']], function (
         Route::put('', 'CashSpecialController@update')->name('update.cash.specials');
     });
 
-    Route::post('logo', 'TenantLogoController@store')->name('store.logo');
-    Route::get('logo', 'TenantLogoController@show')->name('get.logo');
+    Route::group(['prefix' => 'settings'], function () {
+        Route::get('', 'StoreSettingController@index')->name('store.settings');
+        Route::put('', 'StoreSettingController@update')->name('update.store.settings');
 
-    Route::put('store-name', 'StoreNameController@update')->name('set.store.name');
+        Route::get('store-name', 'StoreNameController@index')->name('get.store.name');
+        Route::put('store-name', 'StoreNameController@update')->name('set.store.name');
+
+        Route::post('logo', 'TenantLogoController@store')->name('store.logo');
+    });
 });
 
 // Routes for Super Admin users
@@ -135,6 +140,8 @@ Route::get('health-check', function () {
         'success' => true
     ], 200, []);
 });
+
+Route::get('/settings/logo', 'TenantLogoController@show')->name('get.logo');
 
 // use our custom oauth token controller
 Route::post('oauth/token', 'Auth\SuperAdminTokenAuthController@issueToken')
