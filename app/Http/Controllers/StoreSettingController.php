@@ -15,15 +15,17 @@ class StoreSettingController extends Controller
         }
     }
 
-    public function update(StoreSetting $store_setting)
+    public function update()
     {
         request()->validate([
-            'default_interest_rate' => ['number', 'min:0.01'],
-            'default_tax_rate'      => ['number', 'min:0.01'],
+            'default_interest_rate' => ['numeric', 'min:0.01'],
+            'default_tax_rate'      => ['numeric', 'min:0.01'],
         ]);
 
         try {
-            return response()->json(tap($store_setting)->update(request()->all()), 201);
+            StoreSetting::first()->update(request()->all());
+
+            return response()->json(true, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

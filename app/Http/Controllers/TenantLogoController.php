@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MotoMenus\ImageToBase64;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image as InterventionImage;
 
@@ -36,7 +37,7 @@ class TenantLogoController extends Controller
 
             return response()->json([
                 'status' => 'OK',
-                'url'    => Storage::url($this->directory->path('images/') . $file_name),
+                'url'    => (new ImageToBase64('logo.png'))->base64(),
                 'name'   => $file_name,
             ], 201);
         } catch (\Exception $e) {
@@ -50,13 +51,7 @@ class TenantLogoController extends Controller
     public function show()
     {
         try {
-            if(Storage::exists($this->directory->path('images/logo.png'))) {
-                $path = Storage::url($this->directory->path('images/logo.png'));
-            } else {
-                $path = '/img/logo.png';
-            }
-
-            return response()->json(['path' => $path], 201);
+            return response()->json(['path' => (new ImageToBase64('logo.png'))->base64()], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

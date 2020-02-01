@@ -20,6 +20,17 @@ class UsersTest extends TestCase
         $this->user = User::find(1);
     }
 
+    /** @test * */
+    function can_retrieve_authenticated_user()
+    {
+        Passport::actingAs($this->user);
+
+        $response = $this->get('/api/user');
+        $response->assertStatus(201);
+
+        dd(json_decode($response->getContent(), true));
+    }
+
     /**
      * @test
      *
