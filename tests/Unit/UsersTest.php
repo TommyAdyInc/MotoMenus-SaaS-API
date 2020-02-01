@@ -27,8 +27,6 @@ class UsersTest extends TestCase
 
         $response = $this->get('/api/user');
         $response->assertStatus(201);
-
-        dd(json_decode($response->getContent(), true));
     }
 
     /**
