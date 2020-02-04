@@ -86,8 +86,11 @@ Route::group(['middleware' => ['auth.or.super.admin']], function () {
     });
 
     Route::group(['prefix' => 'users'], function () {
+        Route::delete('/restore/{id}', 'UserController@restore')->name('enable.specific.user');
+
         Route::put('/{user}', 'UserController@update')->name('update.user');
         Route::get('/{user}', 'UserController@show')->name('retrieve.specific.user');
+        Route::delete('/{user}', 'UserController@delete')->name('disable.specific.user');
     });
 
     Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');

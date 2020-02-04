@@ -10,7 +10,21 @@ class UserController extends Controller
     public function index()
     {
         try {
-            return response()->json(User::orderBy('name')->paginate(20), 201);
+            $query = User::orderBy('name');
+
+            if (request()->has('filter')) {
+                if (request()->get('filter') == 'disabled') {
+                    $query->onlyTrashed();
+                }
+
+                if (request()->get('filter') == 'all') {
+                    $query->withTrashed();
+                }
+            } else {
+                $query->withTrashed();
+            }
+
+            return response()->json($query->paginate(20), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -44,12 +58,12 @@ class UserController extends Controller
         ]);
 
         try {
-            if(!isAdmin() && !auth()->user()->isSuperAdmin()) {
-                if(auth()->id() !== $user->id) {
+            if (!isAdmin() && !auth()->user()->isSuperAdmin()) {
+                if (auth()->id() !== $user->id) {
                     throw new \Exception('Can only modify own user data.');
                 }
 
-                if(request()->has('role') && request()->get('role') !== 'user') {
+                if (request()->has('role') && request()->get('role') !== 'user') {
                     throw new \Exception('Not allowed to modify user role.');
                 }
             }
@@ -65,13 +79,36 @@ class UserController extends Controller
     public function show(User $user)
     {
         try {
-            if(!isAdmin() && !auth()->user()->isSuperAdmin()) {
-                if(auth()->id() !== $user->id) {
+            if (!isAdmin() && !auth()->user()->isSuperAdmin()) {
+                if (auth()->id() !== $user->id) {
                     throw new \Exception('Can only view own user data.');
                 }
             }
 
             return response()->json($user, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function delete(User $user)
+    {
+        try {
+            return response()->json($user->delete(), 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $user = User::onlyTrashed()->findOrFail($id);
+
+            $user->deleted_at = null;
+            $user->save();
+
+            return response()->json(true, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

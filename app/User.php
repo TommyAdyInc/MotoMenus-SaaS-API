@@ -69,10 +69,6 @@ class User extends Authenticatable
             $user->password = !empty(request()->get('password')) ? Hash::make(request()->get('password')) : $user->password;
         });
 
-        static::deleting(function ($user) {
-            // $user->notes()->delete();
-        });
-
         parent::boot();
     }
 }
