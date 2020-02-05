@@ -24,7 +24,7 @@ class UserController extends Controller
                 $query->withTrashed();
             }
 
-            return response()->json($query->paginate(20), 201);
+            return response()->json(request()->get('no_paging') ? $query->select('id', 'name')->get() : $query->paginate(20), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

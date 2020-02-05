@@ -54,12 +54,12 @@ class Customer extends Model
 
     public function scopeFilter($query)
     {
-        // loose filtering using request
+        // filtering using request
         collect($this->fillable)
             ->each(function ($field) use (&$query) {
                 if ($this->requestHas($field)) {
                     if ($field == 'user_id') {
-                        $query->whereUserId($field);
+                        $query->whereUserId(request()->get($field));
                     } else {
                         $query->where($field, 'LIKE', '%' . request()->get($field) . '%');
                     }
