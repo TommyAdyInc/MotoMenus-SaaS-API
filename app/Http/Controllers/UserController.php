@@ -52,8 +52,8 @@ class UserController extends Controller
     {
         request()->validate([
             'name'     => ['string', 'min:2'],
-            'email'    => ['email', 'unique:tenant.users,email,' . request()->get('id')],
-            'password' => ['string', 'min:8'],
+            'email'    => ['email', 'unique:tenant.users,email,' . $user->id],
+            'password' => ['nullable', 'string', 'min:8'],
             'role'     => ['in:admin,user']
         ]);
 
@@ -68,9 +68,13 @@ class UserController extends Controller
                 }
             }
 
-            $user->update(request()->all());
+            if (request()->get('password')) {
+                $user->update(request()->all());
+            } else {
+                $user->update(request()->except('password'));
+            }
 
-            return response()->json($user, 201);
+            return response()->json(true, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
