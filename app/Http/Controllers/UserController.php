@@ -74,7 +74,7 @@ class UserController extends Controller
                 $user->update(request()->except('password'));
             }
 
-            return response()->json(true, 201);
+            return response()->json($user, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
