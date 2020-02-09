@@ -21,22 +21,25 @@ class CashSpecialController extends Controller
     public function update()
     {
         request()->validate([
-            'rows'              => ['required', 'array'],
-            'rows.*.id'         => ['required', 'integer'],
-            'rows.*.msrp'       => ['numeric'],
-            'rows.*.discount'   => ['numeric'],
-            'columns'           => ['array'],
-            'columns.*.enabled' => ['boolean'],
+            'cash_specials'                             => ['required', 'array'],
+            'cash_specials.*.columns.*.rows'            => ['required', 'array'],
+            'cash_specials.*.columns.*.rows.*.id'       => ['required', 'integer'],
+            'cash_specials.*.columns.*.rows.*.msrp'     => ['numeric'],
+            'cash_specials.*.columns.*.rows.*.discount' => ['numeric'],
+            'cash_specials.*.columns'                   => ['array'],
+            'cash_specials.*.columns.*.enabled'         => ['boolean'],
         ]);
 
         try {
             // only column enabled, msrp and discount can be updated
-            collect(request()->get('rows'))->each(function ($row) {
-                CashSpecialRow::whereId($row['id'])->update($row);
-            });
+            collect(request()->get('cash_specials'))->each(function ($cash_special) {
+                collect($cash_special['columns'])->each(function ($column) {
+                    CashSpecialColumn::whereId($column['id'])->update(['enabled' => $column['enabled']]);
 
-            collect(request()->get('columns'))->each(function ($column) {
-                CashSpecialColumn::whereId($column['id'])->update(['enabled' => $column['enabled']]);
+                    collect($column['rows'])->each(function ($row) {
+                        CashSpecialRow::whereId($row['id'])->update($row);
+                    });
+                });
             });
 
             return response()->json(true, 201);
