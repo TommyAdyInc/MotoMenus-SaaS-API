@@ -25,7 +25,7 @@ class DealController extends Controller
         ]);
 
         try {
-            return response()->json(Deal::canGetAll()->orderBy('created_at', 'desc')->paginate(20), 201);
+            return response()->json(Deal::canGetAll()->filter()->orderBy('created_at', 'desc')->paginate(20), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

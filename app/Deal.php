@@ -212,13 +212,14 @@ class Deal extends Model
         return $query;
     }
 
+    //
     public function scopeFilter($query)
     {
         if (request()->has('id') && !empty(request()->get('id'))) {
             return $query->whereId(request()->get('id'));
         }
 
-        if (request()->has('sale_status') && !empty(request()->get('sale_status'))) {
+        if (request()->has('sale_status') && !empty(request()->get('sale_status')) && strtolower(request()->get('sale_status')) != 'all') {
             $query->whereSaleStatus(request()->get('sale_status'));
         }
 
