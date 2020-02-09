@@ -19,9 +19,9 @@ class DealController extends Controller
         request()->validate([
             'id'       => ['nullable', 'exists:tenant.deals,id'],
             'user_id'  => ['nullable', 'exists:tenant.users,id'],
-            'customer' => ['array', new KeysMatchFields(new Customer())],
-            'trade'    => ['array', new KeysMatchFields(new Trade())],
-            'unit'     => ['array', new KeysMatchFields(new Unit())],
+            'customer' => ['json', new KeysMatchFields(new Customer())],
+            'trade'    => ['json', new KeysMatchFields(new Trade())],
+            'unit'     => ['json', new KeysMatchFields(new Unit())],
         ]);
 
         try {

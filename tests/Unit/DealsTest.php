@@ -40,27 +40,27 @@ class DealsTest extends TestCase
         Passport::actingAs($this->user);
 
         $response = $this->json('GET', '/api/deal', [
-            'customer' => [
+            'customer' => json_encode([
                 'some_name'
-            ]
+            ])
         ]);
 
         $response->assertStatus(422);
 
         $response = $this->json('GET', '/api/deal', [
-            'customer' => [
+            'customer' => json_encode([
                 'name' => 'some_name'
-            ]
+            ])
         ]);
 
         $response->assertStatus(422);
 
         $response = $this->json('GET', '/api/deal', [
-            'customer' => [
+            'customer' => json_encode([
                 'first_name' => 'some_name',
                 'last_name'  => 'some name',
                 'phone'      => '2345678909',
-            ]
+            ])
         ]);
 
         $response->assertStatus(201);

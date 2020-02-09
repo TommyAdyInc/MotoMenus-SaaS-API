@@ -225,7 +225,7 @@ class Deal extends Model
 
         if (request()->has('customer_type') && !empty(request()->get('customer_type'))) {
             $query->where(function ($q) {
-                collect(request()->get('customer_type'))
+                collect(json_decode(request()->get('customer_type'), true))
                     ->each(function ($type) use (&$q) {
                         $q->orWhere('customer_type', 'like', '%' . $type . '%');
                     });
@@ -234,24 +234,30 @@ class Deal extends Model
 
         if (request()->has('unit') && !empty(request()->get('unit'))) {
             $query->whereHas('units', function ($q) {
-                collect(request()->get('unit'))->each(function ($val, $key) use (&$q) {
-                    $q->where($key, 'LIKE', '%' . $val);
+                collect(json_decode(request()->get('unit'), true))->each(function ($val, $key) use (&$q) {
+                    if (!empty($val)) {
+                        $q->where($key, 'LIKE', '%' . $val);
+                    }
                 });
             });
         }
 
         if (request()->has('trade') && !empty(request()->get('trade'))) {
             $query->whereHas('trades', function ($q) {
-                collect(request()->get('trade'))->each(function ($val, $key) use (&$q) {
-                    $q->where($key, 'LIKE', '%' . $val);
+                collect(json_decode(request()->get('trade'), true))->each(function ($val, $key) use (&$q) {
+                    if (!empty($val)) {
+                        $q->where($key, 'LIKE', '%' . $val);
+                    }
                 });
             });
         }
 
         if (request()->has('customer') && !empty(request()->get('customer'))) {
             $query->whereHas('customer', function ($q) {
-                collect(request()->get('customer'))->each(function ($val, $key) use (&$q) {
-                    $q->where($key, 'LIKE', '%' . $val);
+                collect(json_decode(request()->get('customer'), true))->each(function ($val, $key) use (&$q) {
+                    if (!empty($val)) {
+                        $q->where($key, 'LIKE', '%' . $val);
+                    }
                 });
             });
         }

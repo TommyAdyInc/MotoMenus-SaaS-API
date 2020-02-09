@@ -27,7 +27,7 @@ class KeysMatchFields implements Rule
      */
     public function passes($attribute, $value)
     {
-        $keys = array_keys($value);
+        $keys = array_keys(json_decode($value, true));
         $diff = array_diff($keys, $this->model->getFillable());
 
         return !count($diff);
