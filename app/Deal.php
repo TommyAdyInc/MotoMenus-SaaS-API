@@ -219,13 +219,13 @@ class Deal extends Model
             return $query->whereId(request()->get('id'));
         }
 
-        if (request()->has('sale_status') && !empty(request()->get('sale_status')) && strtolower(request()->get('sale_status')) != 'all') {
-            $query->whereSaleStatus(request()->get('sale_status'));
+        if (request()->has('sales_status') && !empty(request()->get('sales_status')) && strtolower(request()->get('sales_status')) != 'all') {
+            $query->whereSalesStatus(request()->get('sales_status'));
         }
 
         if (request()->has('customer_type') && !empty(request()->get('customer_type'))) {
             $query->where(function ($q) {
-                collect(json_decode(request()->get('customer_type'), true))
+                collect(request()->get('customer_type'))
                     ->each(function ($type) use (&$q) {
                         $q->orWhere('customer_type', 'like', '%' . $type . '%');
                     });

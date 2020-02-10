@@ -34,6 +34,9 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('', 'DealController@store')->name('store.deal');
         Route::put('/{deal}', 'DealController@update')->name('update.deal');
         Route::delete('/{deal}', 'DealController@delete')->name('delete.deal');
+
+        Route::get('sales-steps', 'SalesStepController@index')->name('get.sales.steps');
+        Route::get('customer-types', 'CustomerTypeController@index')->name('get.customer.types');
     });
 
     Route::group(['prefix' => 'finance-insurance'], function () {
