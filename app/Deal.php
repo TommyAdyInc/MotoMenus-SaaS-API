@@ -32,6 +32,11 @@ class Deal extends Model
 
     protected $appends = ['deal_date'];
 
+    public function getCustomerTypeAttribute($value)
+    {
+        return $value ? json_decode($value):  [];
+    }
+
     public function getDealDateAttribute()
     {
         return $this->created_at->format('m/d/Y');
@@ -65,6 +70,11 @@ class Deal extends Model
     public function units(): hasMany
     {
         return $this->hasMany(Unit::class);
+    }
+
+    public function purchase_information()
+    {
+        return $this->hasManyThrough(PurchaseInformation::class, Unit::class);
     }
 
     public function user(): belongsTo
@@ -265,6 +275,17 @@ class Deal extends Model
         return $query;
     }
 
+    public function delete()
+    {
+        $this->units()->delete();
+        $this->trades()->delete();
+        $this->finance_insurance()->delete();
+        $this->payment_schedule()->delete();
+        $this->accessories()->delete();
+        $this->purchase_information()->delete();
+
+        return parent::delete();
+    }
 
     public function setCustomerTypeAttribute($value)
     {

@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::group(['prefix' => 'accessories'], function () {
         Route::post('/{deal}', 'AccessoriesController@store')->name('create.accessory');
         Route::put('/{deal}/{accessories}', 'AccessoriesController@update')->name('update.accessory');
-        Route::delete('/{deal}/{accessories}', 'AccessoriesController@store')->name('delete.accessory');
+        Route::delete('/{deal}/{accessories}', 'AccessoriesController@delete')->name('delete.accessory');
     });
 
     Route::group(['prefix' => 'customers'], function () {
@@ -43,13 +43,13 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/{deal}', 'FinanceInsuranceController@store')->name('create.finance.insurance');
         Route::put('/{deal}/{payment_schedule}', 'FinanceInsuranceController@update')->name('update.finance.insurance');
         Route::delete('/{deal}/{payment_schedule}',
-            'FinanceInsuranceController@store')->name('delete.finance.insurance');
+            'FinanceInsuranceController@delete')->name('delete.finance.insurance');
     });
 
     Route::group(['prefix' => 'payment-schedule'], function () {
         Route::post('/{deal}', 'PaymentScheduleController@store')->name('create.payment.schedule');
         Route::put('/{deal}/{payment_schedule}', 'PaymentScheduleController@update')->name('update.payment.schedule');
-        Route::delete('/{deal}/{payment_schedule}', 'PaymentScheduleController@store')->name('delete.payment.schedule');
+        Route::delete('/{deal}/{payment_schedule}', 'PaymentScheduleController@delete')->name('delete.payment.schedule');
     });
 
     Route::group(['prefix' => 'purchase-information'], function () {
@@ -57,19 +57,19 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::put('/{deal}/{unit}/{purchase_information}',
             'PurchaseInformationController@update')->name('update.purchase.information');
         Route::delete('/{deal}/{unit}/{purchase_information}',
-            'PurchaseInformationController@store')->name('delete.purchase.information');
+            'PurchaseInformationController@delete')->name('delete.purchase.information');
     });
 
     Route::group(['prefix' => 'trades'], function () {
         Route::post('/{deal}', 'TradesController@store')->name('create.trade');
         Route::put('/{deal}/{trade}', 'TradesController@update')->name('update.trade');
-        Route::delete('/{deal}/{trade}', 'TradesController@store')->name('delete.trade');
+        Route::delete('/{deal}/{trade}', 'TradesController@delete')->name('delete.trade');
     });
 
     Route::group(['prefix' => 'units'], function () {
         Route::post('/{deal}', 'UnitsController@store')->name('create.unit');
         Route::put('/{deal}/{unit}', 'UnitsController@update')->name('update.unit');
-        Route::delete('/{deal}/{unit}', 'UnitsController@store')->name('delete.unit');
+        Route::delete('/{deal}/{unit}', 'UnitsController@delete')->name('delete.unit');
     });
 });
 

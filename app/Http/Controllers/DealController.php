@@ -174,18 +174,18 @@ class DealController extends Controller
             'accessories'                                               => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
             'accessories.*.item_name'                                   => ['required_with:accessories', 'string'],
-            'accessories.*.msrp'                                        => ['numeric', 'min:0'],
-            'accessories.*.labor'                                       => ['numeric', 'min:0'],
-            'accessories.*.unit_price'                                  => ['numeric', 'min:0'],
+            'accessories.*.msrp'                                        => ['nullable', 'numeric', 'min:0'],
+            'accessories.*.labor'                                       => ['nullable', 'numeric', 'min:0'],
+            'accessories.*.unit_price'                                  => ['nullable', 'numeric', 'min:0'],
             'accessories.*.quantity'                                    => ['required', 'integer', 'min:1'],
             'units'                                                     => ['nullable', 'array'],
             // Array of one or more units. May be submitted as empty value and will then be ignored
-            'units.*.odometer'                                          => ['numeric', 'min:0'],
-            'units.*.year'                                              => ['integer'],
+            'units.*.odometer'                                          => ['nullable', 'numeric', 'min:0'],
+            'units.*.year'                                              => ['nullable', 'integer'],
             'trades'                                                    => ['nullable', 'array'],
             // Array of one or more trades. May be submitted as empty value and will then be ignored
-            'trades.*.odometer'                                         => ['numeric', 'min:0'],
-            'trades.*.year'                                             => ['integer'],
+            'trades.*.odometer'                                         => ['nullable', 'numeric', 'min:0'],
+            'trades.*.year'                                             => ['nullable', 'integer'],
             'sales_status'                                              => [
                 'required',
                 Rule::in(
@@ -214,7 +214,7 @@ class DealController extends Controller
                 'numeric',
                 Rule::in(config('payment_months'))
             ],
-            'finance_insurance'                                         => ['array'],
+            'finance_insurance'                                         => ['nullable', 'array'],
             'finance_insurance.cash_down_payment'                       => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.preferred_standard_rate'                 => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.preferred_standard_term'                 => ['nullable', 'numeric', 'min:0'],
@@ -227,7 +227,7 @@ class DealController extends Controller
             'finance_insurance.theft'                                   => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.priority_maintenance'                    => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.appearance_protection'                   => ['nullable', 'numeric', 'min:0'],
-            'units.*.purchase_information'                              => ['array'],
+            'units.*.purchase_information'                              => ['nullable', 'array'],
             'units.*.purchase_information.msrp'                         => [
                 'required_with:purchase_information',
                 'numeric'
@@ -288,18 +288,18 @@ class DealController extends Controller
             'accessories'                                               => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
             'accessories.*.item_name'                                   => ['string'],
-            'accessories.*.msrp'                                        => ['numeric', 'min:0'],
-            'accessories.*.labor'                                       => ['numeric', 'min:0'],
-            'accessories.*.unit_price'                                  => ['numeric', 'min:0'],
+            'accessories.*.msrp'                                        => ['nullable', 'numeric', 'min:0'],
+            'accessories.*.labor'                                       => ['nullable', 'numeric', 'min:0'],
+            'accessories.*.unit_price'                                  => ['nullable', 'numeric', 'min:0'],
             'accessories.*.quantity'                                    => ['integer', 'min:1'],
             'units'                                                     => ['nullable', 'array'],
             // Array of one or more units. May be submitted as empty value and will then be ignored
-            'units.*.odometer'                                          => ['numeric', 'min:0'],
-            'units.*.year'                                              => ['integer'],
+            'units.*.odometer'                                          => ['nullable', 'numeric', 'min:0'],
+            'units.*.year'                                              => ['nullable', 'integer'],
             'trades'                                                    => ['nullable', 'array'],
             // Array of one or more trades. May be submitted as empty value and will then be ignored
-            'trades.*.odometer'                                         => ['numeric', 'min:0'],
-            'trades.*.year'                                             => ['integer'],
+            'trades.*.odometer'                                         => ['nullable', 'numeric', 'min:0'],
+            'trades.*.year'                                             => ['nullable', 'integer'],
             'sales_status'                                              => [
                 'required',
                 Rule::in(
@@ -328,7 +328,7 @@ class DealController extends Controller
                 'numeric',
                 Rule::in(config('payment_months'))
             ],
-            'finance_insurance'                                         => ['array'],
+            'finance_insurance'                                         => ['nullable', 'array'],
             'finance_insurance.cash_down_payment'                       => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.preferred_standard_rate'                 => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.preferred_standard_term'                 => ['nullable', 'numeric', 'min:0'],
@@ -341,7 +341,7 @@ class DealController extends Controller
             'finance_insurance.theft'                                   => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.priority_maintenance'                    => ['nullable', 'numeric', 'min:0'],
             'finance_insurance.appearance_protection'                   => ['nullable', 'numeric', 'min:0'],
-            'purchase_information'                                      => ['array'],
+            'purchase_information'                                      => ['nullable', 'array'],
             'purchase_information.msrp'                                 => [
                 'required_with:purchase_information',
                 'numeric'
