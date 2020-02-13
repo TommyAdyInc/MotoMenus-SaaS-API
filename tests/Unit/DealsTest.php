@@ -489,7 +489,7 @@ class DealsTest extends TestCase
         ]))
             ->assertStatus(201)
             ->assertJsonFragment(['Investigation'])
-            ->assertJsonFragment(['["Walk-in"]']);
+            ->assertJsonFragment(['Walk-in']);
     }
 
     /** @test * */
