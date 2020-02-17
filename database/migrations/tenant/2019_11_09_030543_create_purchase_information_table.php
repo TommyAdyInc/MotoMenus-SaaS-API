@@ -31,7 +31,7 @@ class CreatePurchaseInformationTable extends Migration
             $table->decimal('payoff_balance_owed')->nullable();
             $table->decimal('title_trip_fee')->nullable();
             $table->decimal('deposit')->nullable();
-            $table->boolean('taxable_show_msrp_on_pdf')->default(false);
+            $table->boolean('show_msrp_on_pdf')->default(false);
             $table->boolean('taxable_price')->default(true);
             $table->boolean('taxable_manufacturer_freight')->default(true);
             $table->boolean('taxable_technician_setup')->default(true);
