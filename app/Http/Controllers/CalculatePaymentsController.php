@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Moto\PaymentsCalculation;
+use App\MotoMenus\PaymentsCalculation;
 use Illuminate\Http\Request;
 
 class CalculatePaymentsController extends Controller

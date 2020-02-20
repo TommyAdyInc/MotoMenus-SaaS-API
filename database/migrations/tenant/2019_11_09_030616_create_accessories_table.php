@@ -16,9 +16,9 @@ class CreateAccessoriesTable extends Migration
         Schema::create('accessories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('part_number')->nullable();
-            $table->string('item_name');
+            $table->string('item_name')->nullable();
             $table->mediumText('description')->nullable();
-            $table->mediumInteger('quantity');
+            $table->mediumInteger('quantity')->default(1);
             $table->decimal('msrp')->nullable();
             $table->decimal('unit_price')->nullable();
             $table->decimal('labor')->nullable();

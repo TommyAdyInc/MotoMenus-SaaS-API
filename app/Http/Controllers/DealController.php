@@ -173,7 +173,7 @@ class DealController extends Controller
             'customer.email'                                            => ['required_without:customer.id', 'email'],
             'accessories'                                               => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
-            'accessories.*.item_name'                                   => ['required_with:accessories', 'string'],
+            'accessories.*.item_name'                                   => ['nullable', 'string'],
             'accessories.*.msrp'                                        => ['nullable', 'numeric', 'min:0'],
             'accessories.*.labor'                                       => ['nullable', 'numeric', 'min:0'],
             'accessories.*.unit_price'                                  => ['nullable', 'numeric', 'min:0'],
@@ -287,7 +287,7 @@ class DealController extends Controller
             'customer.email'                                            => ['email'],
             'accessories'                                               => ['nullable', 'array'],
             // Array of one or more accessories. May be submitted as empty value and will then be ignored
-            'accessories.*.item_name'                                   => ['string'],
+            'accessories.*.item_name'                                   => ['nullable','string'],
             'accessories.*.msrp'                                        => ['nullable', 'numeric', 'min:0'],
             'accessories.*.labor'                                       => ['nullable', 'numeric', 'min:0'],
             'accessories.*.unit_price'                                  => ['nullable', 'numeric', 'min:0'],

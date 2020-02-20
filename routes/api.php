@@ -99,6 +99,12 @@ Route::group(['middleware' => ['auth.or.super.admin']], function () {
     Route::post('calculate-payments', 'CalculatePaymentsController@store')->name('calculate.payments');
     Route::get('pdf/cash-special', 'DownloadCashSpecialsPdfController@show')->name('cash.specials.pdf');
     Route::get('pdf/{deal}', 'DownloadPdfController@show')->name('download.pdf');
+
+    Route::group(['prefix' => 'settings'], function () {
+        Route::get('', 'StoreSettingController@index')->name('store.settings');
+        Route::get('document-fee', 'GlobalSettingController@index')->name('document.fee');
+        Route::get('payment-months', 'PaymentMonthsController@index')->name('get.payment.months');
+    });
 });
 
 // Routes for Tenant Admin users
@@ -114,7 +120,6 @@ Route::group(['middleware' => ['auth.or.super.admin', 'auth.admin']], function (
     });
 
     Route::group(['prefix' => 'settings'], function () {
-        Route::get('', 'StoreSettingController@index')->name('store.settings');
         Route::put('', 'StoreSettingController@update')->name('update.store.settings');
 
         Route::get('store-name', 'StoreNameController@index')->name('get.store.name');
