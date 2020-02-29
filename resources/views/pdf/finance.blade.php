@@ -332,7 +332,7 @@
         </div>
         <br style="clear: both; "/>
     </div>
-    @if($deal->finance_insurance->preferred_standard_rate)
+    @if($deal->preferred)
         <table
             style="width: @if($deal->finance_insurance->promotional_rate && $deal->finance_insurance->promotional_term) 75% @else 50% @endif;">
             <tr>
@@ -414,7 +414,7 @@
             <tr>
                 <td><b>Monthly</b>&nbsp;&nbsp;&nbsp;${{number_format($deal->preferred, 2)}}</td>
                 <td><b>Monthly</b>&nbsp;&nbsp;&nbsp;${{number_format($deal->standard, 2)}}</td>
-                @if($deal->finance_insurance->promotional_rate && $deal->finance_insurance->promotional_term)
+                @if($deal->promotional)
                     <td><b>Monthly</b>&nbsp;&nbsp;&nbsp;${{number_format($deal->promotional, 2)}}</td>
                 @endif
             </tr>

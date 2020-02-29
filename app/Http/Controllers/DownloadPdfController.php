@@ -14,9 +14,9 @@ class DownloadPdfController extends Controller
     {
         request()->validate([
             'type'  => ['required', 'in:deal,finance'],
-            'unit'  => ['nullable', 'exists:tenant.units,id'],
+            'unit'  => ['nullable', 'array'],
             // can be unit id or null for all units,
-            'trade' => ['nullable', 'exists:tenant.trades,id'],
+            'trade' => ['nullable', 'array'],
             // trade id or null for all
         ]);
 
@@ -26,11 +26,11 @@ class DownloadPdfController extends Controller
 
             // if selected unit or trade doesn't belong to deal throw error
             if (request()->get('type') == 'finance') {
-                if (request()->get('unit') && !$deal->units->firstWhere('id', request()->get('unit'))) {
+                if (!empty(request()->get('unit')) && !$deal->units->whereIn('id', request()->get('unit'))) {
                     throw new \Exception('Unit doesn\'t belong to the deal');
                 }
 
-                if (request()->get('trade') && !$deal->trades->firstWhere('id', request()->get('trade'))) {
+                if (!empty(request()->get('trade')) && !$deal->trades->whereIn('id', request()->get('trade'))) {
                     throw new \Exception('Trade doesn\'t belong to the deal');
                 }
             }
@@ -47,20 +47,20 @@ class DownloadPdfController extends Controller
 
             return response()->json(base64_encode($pdf->output()), 201); // $view->render()
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+            return response()->json(['error' => $e->getTrace()], 422);
         }
     }
 
     private function setTotal(Deal $deal)
     {
         // filter for unit
-        if (request()->get('unit')) {
-            $deal->units = $deal->units->where('id', request()->get('unit'));
+        if (!empty(request()->get('unit'))) {
+            $deal->units = $deal->units->whereIn('id', request()->get('unit'));
         }
 
         // filter for trade
-        if (request()->get('trade')) {
-            $deal->trades = $deal->trades->where('id', request()->get('trade'));
+        if (!empty(request()->get('trade'))) {
+            $deal->trades = $deal->trades->whereIn('id', request()->get('trade'));
         }
 
         // set total purchase information
@@ -121,19 +121,27 @@ class DownloadPdfController extends Controller
 
     private function monthly(Deal $deal, string $type)
     {
-        $monthly = new PaymentsCalculation([$deal->finance_insurance->cash_down_payment],
-            $deal->finance_insurance->preferred_standard_rate,
-            $deal->total['cash_balance'] + $deal->finance_insurance->{$type});
+        if($deal->finance_insurance->preferred_standard_rate && $deal->finance_insurance->preferred_standard_term) {
+            $monthly = new PaymentsCalculation([$deal->finance_insurance->cash_down_payment],
+                $deal->finance_insurance->preferred_standard_rate,
+                $deal->total['cash_balance'] + $deal->finance_insurance->{$type});
 
-        return $monthly->getPayments()[$deal->finance_insurance->preferred_standard_term][$deal->finance_insurance->cash_down_payment];
+            return $monthly->getPayments()[$deal->finance_insurance->preferred_standard_term][$deal->finance_insurance->cash_down_payment];
+        }
+
+        return null;
     }
 
     private function promotional(Deal $deal)
     {
-        $monthly = new PaymentsCalculation([$deal->finance_insurance->cash_down_payment],
-            $deal->finance_insurance->promotional_rate,
-            $deal->total['cash_balance'] + $deal->finance_insurance->preferred);
+        if($deal->finance_insurance->promotional_rate && $deal->finance_insurance->promotional_term) {
+            $monthly = new PaymentsCalculation([$deal->finance_insurance->cash_down_payment],
+                $deal->finance_insurance->promotional_rate,
+                $deal->total['cash_balance'] + $deal->finance_insurance->preferred);
 
-        return $monthly->getPayments()[$deal->finance_insurance->promotional_term][$deal->finance_insurance->cash_down_payment];
+            return $monthly->getPayments()[$deal->finance_insurance->promotional_term][$deal->finance_insurance->cash_down_payment];
+        }
+
+        return null;
     }
 }
