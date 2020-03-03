@@ -139,10 +139,13 @@ Route::group(['middleware' => ['auth:api_super_admin', 'auth.super.admin']], fun
     Route::group(['prefix' => 'tenants'], function () {
         Route::get('', 'TenantsController@index')->name('get.tenants');
         Route::post('', 'TenantsController@store')->name('create.tenant');
-        Route::put('', 'StoreNameController@update')->name('update.tenant'); // Only update Store Name
+        Route::put('{website}', 'TenantsController@update')->name('update.tenant'); // Only update Store Name
         Route::get('{website}', 'TenantsController@show')->name('show.tenant');
         Route::delete('{website}', 'TenantsController@delete')->name('delete.tenant');
+        Route::delete('/restore/{website}', 'TenantsController@restore')->name('restore.tenant');
     });
+
+    Route::put('super-admin-user', 'SuperAdminController@update')->name('update.super.password');
 });
 
 Route::get('health-check', function () {

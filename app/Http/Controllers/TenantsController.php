@@ -13,7 +13,7 @@ class TenantsController extends Controller
     public function index()
     {
         try {
-            return response()->json(Website::with('hostnames')->get(), 201);
+            return response()->json(Website::withTrashed()->with('hostnames')->paginate(15), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -31,10 +31,7 @@ class TenantsController extends Controller
     public function store()
     {
         request()->validate([
-            'fqdn'       => [
-                'required',
-                'unique:connection_system.hostnames,fqdn',
-            ],
+            'fqdn'       => ['required', 'unique:connection_system.hostnames,fqdn'],
             'store_name' => ['required', 'min:3',]
         ]);
 
@@ -43,12 +40,33 @@ class TenantsController extends Controller
             $website->store_name = request()->get('store_name');
             app(WebsiteRepository::class)->create($website);
 
-            $hostname = new Hostname;
-            $hostname->fqdn = request()->get('fqdn');
-            $hostname = app(HostnameRepository::class)->create($hostname);
-            app(HostnameRepository::class)->attach($hostname, $website);
+            try {
+                $hostname = new Hostname;
+                $hostname->fqdn = request()->get('fqdn');
+                $hostname = app(HostnameRepository::class)->create($hostname);
+                app(HostnameRepository::class)->attach($hostname, $website);
+            } catch (\Exception $e) {
+                $website->forceDelete();
+
+                throw $e;
+            }
 
             return response()->json($website->fresh()->load('hostnames'), 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function update(Website $website)
+    {
+        request()->validate([
+            'store_name' => ['required', 'min:3'],
+        ]);
+
+        try {
+            $website->update(['store_name' => request()->get('name')]);
+
+            return response()->json(true, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
@@ -57,8 +75,6 @@ class TenantsController extends Controller
     public function delete(Website $website)
     {
         try {
-            // $website->hostnames()->delete();
-
             $website->delete();
 
             return response()->json(true, 201);
@@ -67,11 +83,10 @@ class TenantsController extends Controller
         }
     }
 
-    public function restore(Website $website)
+    public function restore($website)
     {
         try {
-            // $website->hostnames()->delete();
-
+            $website = Website::onlyTrashed()->find($website);
             $website->deleted_at = null;
             $website->save();
 
