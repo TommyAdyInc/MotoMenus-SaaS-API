@@ -43,7 +43,7 @@ class TenantsTest extends TestCase
     }
 
     /** @test * */
-    function create_new_tenant_returns_newly_created_tenant()
+    /*function create_new_tenant_returns_newly_created_tenant()
     {
         PassportMultiAuth::actingAs($this->super_admin);
 
@@ -54,7 +54,7 @@ class TenantsTest extends TestCase
             ->assertStatus(201)
             ->assertJsonFragment(['Demo Store'])
             ->assertJsonFragment(['motomenus.demo.app']);
-    }
+    }*/
 
     /** @test * */
     function tenants_can_be_archived()

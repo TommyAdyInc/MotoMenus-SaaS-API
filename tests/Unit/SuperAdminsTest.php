@@ -38,7 +38,7 @@ class SuperAdminsTest extends TestCase
 
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('GET', '/api/global-settings')->assertStatus(201);
+        $this->json('GET', '/api/global-settings?admin=1')->assertStatus(201);
     }
 
     /** @test * */
@@ -50,7 +50,7 @@ class SuperAdminsTest extends TestCase
 
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('PUT', '/api/global-settings', ['document_fee' => 123])->assertStatus(201);
+        $this->json('PUT', '/api/global-settings', ['document_fee' => 123, 'admin' => 1])->assertStatus(201);
     }
 
     /** @test * */
@@ -58,7 +58,7 @@ class SuperAdminsTest extends TestCase
     {
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('GET', '/api/customers')
+        $this->json('GET', '/api/customers?admin=1')
             ->assertStatus(201);
     }
 
@@ -67,7 +67,7 @@ class SuperAdminsTest extends TestCase
     {
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('GET', '/api/users')
+        $this->json('GET', '/api/users?admin=1')
             ->assertStatus(201);
     }
 
@@ -76,11 +76,12 @@ class SuperAdminsTest extends TestCase
     {
         PassportMultiAuth::actingAs($this->super_admin);
 
-        $this->json('POST','/api/users', [
+        $this->json('POST', '/api/users', [
             'name'     => 'Test Name',
             'email'    => 'test@test.com',
             'password' => 'test1234',
             'role'     => 'user',
+            'admin'    => 1,
         ])->assertStatus(201);
     }
 
@@ -94,6 +95,7 @@ class SuperAdminsTest extends TestCase
             'email'    => 'test@test.com',
             'password' => 'test1234',
             'role'     => 'user',
+            'admin'    => 1,
         ]);
 
         $response = json_decode((string)$response->getContent(), true);
@@ -101,7 +103,8 @@ class SuperAdminsTest extends TestCase
 
         $response = $this->put('/api/users/' . $response['id'], [
             'name' => 'My Updated Name',
-            'role' => 'admin'
+            'role' => 'admin',
+            'admin' => 1
         ]);
 
         $response->assertStatus(201);
